@@ -338,7 +338,7 @@
           "category": "Terminal",
           "status": "draft",
           "story": "Components/Terminal/LogView",
-          "updated": "2026-09-22",
+          "updated": "2026-10-28",
           "component": "LogView (import from @scorp-ds/components)",
           "summary": "LOG VIEW COMPONENT"
         },
@@ -626,9 +626,9 @@
           "category": "Display",
           "status": "draft",
           "story": "Components/Display/TuiIcon",
-          "updated": "2026-09-22",
+          "updated": "2026-10-28",
           "component": "TuiIcon (import from @scorp-ds/components)",
-          "summary": "TuiIcon is the system's only icon component: 51 names drawn as 1-bit pixel art on a 7x7 grid."
+          "summary": "TuiIcon is the system's only icon component: 52 names drawn as 1-bit pixel art on a 7x7 grid."
         },
         {
           "name": "VisuallyHidden",

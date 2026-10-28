@@ -24,7 +24,8 @@
  * - plate.round-lg (frame), focus inset ring
  */
 
-import { useCallback, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
+import { useFollowScroll } from "@/lib/use-follow-scroll";
 import { cn } from "@/lib/utils";
 import { Button } from "./Button";
 import { TuiIcon, type TuiIconName } from "./TuiIcon";
@@ -75,9 +76,6 @@ const LEVELS: Record<LogLevel, { icon: TuiIconName; tag: string; tone: string }>
   debug: { icon: "Settings", tag: "DEBUG", tone: "text-secondary-700 dark:text-secondary-400" },
 };
 
-/** Distance from the bottom (px) still treated as "at the bottom". */
-const BOTTOM_THRESHOLD = 8;
-
 /**
  * LogView
  *
@@ -100,54 +98,13 @@ export function LogView({
   onFollowChange,
   className,
 }: LogViewProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [following, setFollowing] = useState(true);
-  const [unseen, setUnseen] = useState(0);
-  const prevCountRef = useRef(lines.length);
-
-  const updateFollowing = useCallback(
-    (next: boolean) => {
-      setFollowing((prev) => {
-        if (prev !== next) onFollowChange?.(next);
-        return next;
-      });
-    },
-    [onFollowChange]
-  );
-
-  const scrollToBottom = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    el.scrollTop = el.scrollHeight;
-  }, []);
-
-  // Runs on mount too (starts at the bottom). Our own scrollTop writes also
-  // fire scroll events, but they land at the bottom, so following holds.
-  // New lines: follow when allowed, otherwise count them as unseen.
-  useLayoutEffect(() => {
-    const added = lines.length - prevCountRef.current;
-    prevCountRef.current = lines.length;
-    if (!autoScroll) return;
-    if (following) {
-      scrollToBottom();
-    } else if (added > 0) {
-      setUnseen((n) => n + added);
-    }
-  }, [lines, autoScroll, following, scrollToBottom]);
-
-  const handleScroll = () => {
-    const el = scrollRef.current;
-    if (!el || !autoScroll) return;
-    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= BOTTOM_THRESHOLD;
-    updateFollowing(atBottom);
-    if (atBottom) setUnseen(0);
-  };
-
-  const resume = () => {
-    setUnseen(0);
-    updateFollowing(true);
-    scrollToBottom();
-  };
+  // Follow, pause and resume live in the shared useFollowScroll hook.
+  const { scrollRef, onScroll: handleScroll, following, unseen, resume } = useFollowScroll({
+    content: lines,
+    count: lines.length,
+    enabled: autoScroll,
+    onFollowChange,
+  });
 
   // Keep the level column aligned for lines without a level.
   const hasLevels = lines.some((l) => l.level);
