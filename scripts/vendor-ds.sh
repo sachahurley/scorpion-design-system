@@ -22,7 +22,9 @@
 #   6. vendor/scorp-ds/VERSION                           (source commit)
 #
 # Source of truth: origin/main of the scorp-ds repo, read via git from the
-# checkout at $SCORP_DS_DIR (default ~/Projects/scorp-ds). The checkout's
+# checkout at $SCORP_DS_DIR (default ~/Projects/scorp-ds). SCORP_DS_REF reads
+# another commit instead; scorp-ds's `npm run consumers:check` sets it to
+# dry-run a branch against this site before that branch merges. The checkout's
 # working tree and current branch are irrelevant (other agent sessions may
 # have it on a feature branch). This site is a deliberate snapshot, NOT
 # auto-synced on every DS merge: run this when the visual language changes.
@@ -45,7 +47,7 @@ fi
 git -C "$SCORP_DS_DIR" fetch origin main -q 2>/dev/null || \
   echo "warn: could not fetch; vendoring from last-fetched origin/main" >&2
 
-REF="origin/main"
+REF="${SCORP_DS_REF:-origin/main}"
 ds_file() { git -C "$SCORP_DS_DIR" show "$REF:$1"; }
 
 # Every component the DS exports, read from its source tree so new ones
