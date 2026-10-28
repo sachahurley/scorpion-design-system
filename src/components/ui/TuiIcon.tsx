@@ -63,6 +63,7 @@ export const TUI_ICON_GLYPHS = {
   SkipBack: "\u23EE", // previous track (bar + left triangle)
   SkipForward: "\u23ED", // next track (right triangle + bar)
   Star: "\u2605", // ★ black star
+  Stop: "\u23F9", // stop square (media stop, ends a running response)
   Sun: "\u2600", // ☀ sun
   Tag: "\u2302", // ⌂ house / label
   Trash2: "\u2717", // ✗ ballot X
@@ -469,6 +470,15 @@ export const TUI_ICON_BITMAPS: Record<TuiIconName, readonly string[]> = {
     "..###..",
     ".##.##.",
     ".#...#.",
+  ],
+  Stop: [
+    ".......",
+    ".#####.",
+    ".#####.",
+    ".#####.",
+    ".#####.",
+    ".#####.",
+    ".......",
   ],
   Sun: [
     "...#...",
