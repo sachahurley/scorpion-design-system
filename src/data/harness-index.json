@@ -19,7 +19,7 @@
     "baselines": 554,
     "lintRules": 8,
     "skills": 19,
-    "decisions": 21,
+    "decisions": 22,
     "insights": 5,
     "tokens": 423
   },
@@ -319,6 +319,12 @@
       "title": "Consumers are built against a change before it merges",
       "affects": "check-consumers.mjs, API changes",
       "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0021-consumers-are-built-before-merge.md"
+    },
+    {
+      "id": "0022",
+      "title": "Text-field focus is a colour change, not an inset ring",
+      "affects": "Input, Textarea",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0022-field-focus-is-a-colour-change.md"
     }
   ],
   "insights": [
