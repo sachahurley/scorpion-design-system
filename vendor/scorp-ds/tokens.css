@@ -205,6 +205,7 @@
   --font-size-4xl: 64px;
   --font-size-5xl: 80px;
   --font-size-6xl: 96px;
+  --font-size-page-title: 36px; /* long-form page h1; role-named, sits between 2xl and 3xl */
   
   /* Font line height tokens */
   --line-height-none: 1;

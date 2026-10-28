@@ -3,29 +3,29 @@
  *
  * "Design Systems for AI-First Product Development" - the long-form essay
  * that used to live inside the Home page's Design Philosophy modal, now a
- * page of its own. The content is authored as a typed CaseStudyBlock array
- * and rendered by CaseStudyBlocks, so the block library does the layout:
- * headlines per section, prose for paragraphs, insights for the numbered
- * workflow steps, callouts and lists for the short bullet runs.
+ * page of its own. The content is authored as a typed EditorialBlock array
+ * and rendered by EditorialBlocks: headings per section, and the DS case
+ * study blocks for the rest (prose for paragraphs, insights for the numbered
+ * workflow steps, callouts and lists for the short bullet runs).
  *
  * The words are Sacha's original essay text, restructured into the block
  * vocabulary - edit the ESSAY array to revise the content.
  */
 
 import { Link as RouterLink } from "react-router-dom";
-import { CaseStudyBlocks, type CaseStudyBlock } from "@/components/ui/CaseStudy";
+import { EditorialBlocks, type EditorialBlock } from "@/components/docs/EditorialBlocks";
 import { Link } from "@/components/ui/Link";
 
 // The essay, section by section. Blocks render in array order.
-const ESSAY: CaseStudyBlock[] = [
+const ESSAY: EditorialBlock[] = [
   {
-    type: "headline",
+    type: "heading",
     kicker: "Essay",
     title: "Design Systems for AI-First Product Development",
   },
 
   // THE PHILOSOPHY
-  { type: "headline", title: "The Philosophy" },
+  { type: "heading", title: "The Philosophy" },
   {
     type: "prose",
     text: "As product design evolves with AI-first tools, design-system-first has become essential, not optional. The quality of your input, whether design tokens in Figma or a code-based design system, directly determines the quality and accuracy of AI-generated outputs. Pixel-perfect products require systematic, high-quality foundations that AI agents can reliably draw from.",
@@ -33,7 +33,7 @@ const ESSAY: CaseStudyBlock[] = [
 
   // THE CHALLENGE
   {
-    type: "headline",
+    type: "heading",
     title: "The Challenge",
     text: "Most teams face one of these scenarios:",
   },
@@ -51,7 +51,7 @@ const ESSAY: CaseStudyBlock[] = [
 
   // APPROACH 1: ZERO TO ONE
   {
-    type: "headline",
+    type: "heading",
     title: "Approach 1: Zero to One (No Design System)",
     text: "Foundation First: Establish a three-layer design token system covering:",
   },
@@ -64,7 +64,7 @@ const ESSAY: CaseStudyBlock[] = [
       { title: "Surface colors", text: "Page, container, card, button, etc." },
     ],
   },
-  { type: "headline", title: "The Workflow" },
+  { type: "heading", title: "The Workflow" },
   {
     type: "insights",
     items: [
@@ -106,11 +106,11 @@ const ESSAY: CaseStudyBlock[] = [
 
   // APPROACH 2: EXISTING CODE TOKEN SYSTEM
   {
-    type: "headline",
+    type: "heading",
     title: "Approach 2: Existing Code Token System (No Visual Documentation)",
     text: "The Reality: A design token system exists in code, but there's no visual documentation for designers to reference. Designers can't see what tokens exist or how they're expressed visually.",
   },
-  { type: "headline", title: "The Workflow" },
+  { type: "heading", title: "The Workflow" },
   {
     type: "insights",
     items: [
@@ -146,7 +146,7 @@ const ESSAY: CaseStudyBlock[] = [
   },
 
   // THE PAYOFF
-  { type: "headline", title: "The Payoff" },
+  { type: "heading", title: "The Payoff" },
   {
     type: "prose",
     text: "A well-documented design system with accurate token naming allows you to rapidly assemble components when working with AI agents, ensuring consistency and quality while dramatically accelerating development speed. The bidirectional workflow between Figma and code, anchored by your markdown naming system, keeps design and implementation synchronized from day one.",
@@ -158,7 +158,7 @@ export default function Essay() {
     <div className="container mx-auto px-5 lg:px-10 pt-5 lg:pt-10 pb-5 lg:pb-20">
       {/* Reading column: breakout figures size against this inline-size container */}
       <div className="mx-auto max-w-2xl [container-type:inline-size]">
-        <CaseStudyBlocks blocks={ESSAY} />
+        <EditorialBlocks blocks={ESSAY} />
 
         {/* Outbound links: the essay argues the approach, these show it applied.
             Matches the footer row on Home, Case Study, Skills and Harness. */}

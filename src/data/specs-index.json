@@ -133,10 +133,10 @@
           "layer": "component",
           "category": "Patterns",
           "status": "draft",
-          "story": "Patterns/CaseStudyBlocks (full page: Screens/CaseStudyTemplate)",
-          "updated": "2026-09-22",
-          "component": "CaseStudyBlocks (import from @scorp-ds/components)",
-          "summary": "CaseStudyBlocks is the long-form section library upstreamed from the portfolio's case-study pages: you author a page as a typed CaseStudyBlock[] array and one renderer draws every section with consistent rhythm and tokens."
+          "story": "Patterns/CaseStudy (full pages: Screens/CaseStudyTemplate)",
+          "updated": "2026-10-27",
+          "component": "CaseStudyPage (also CaseStudyHeader, CaseStudySections, CaseStudyContent; import from @scorp-ds/components)",
+          "summary": "CaseStudy renders long-form narrative pages (case studies, write-ups, project pages) from data."
         },
         {
           "name": "Center",

@@ -5,7 +5,7 @@
  * CI workflows, the token drift test, the accessibility pass, the visual
  * baselines, the API-surface contract, and the written records behind them.
  *
- * Authored as a typed CaseStudyBlock array, the same editorial layout as the
+ * Authored as a typed EditorialBlock array, the same editorial layout as the
  * Essay, Case Study and Skills pages, with two additions the other pages
  * don't use:
  *
@@ -25,7 +25,8 @@
  */
 
 import { Link as RouterLink } from "react-router-dom";
-import { CaseStudyBlocks, type CaseStudyBlock, type CaseStudySlots } from "@/components/ui/CaseStudy";
+import type { CaseStudySlots } from "@/components/ui/CaseStudy";
+import { EditorialBlocks, type EditorialBlock } from "@/components/docs/EditorialBlocks";
 import { Link } from "@/components/ui/Link";
 import { ListRow } from "@/components/ui/ListRow";
 import { LogView } from "@/components/ui/LogView";
@@ -87,7 +88,7 @@ interface HarnessIndex {
 const h = harnessIndex as HarnessIndex;
 const n = h.counts;
 
-// Text tones matching the CaseStudyBlocks body treatment (see Specs page)
+// Text tones matching the CaseStudy body treatment (see Specs page)
 const BODY_TEXT = "text-sm font-mono text-secondary-800 dark:text-secondary-500";
 const MUTED_CELL = "text-secondary-700 dark:text-secondary-600";
 
@@ -191,9 +192,9 @@ const BASELINE_DIAGRAM = diagram(`
 
 // ── The page ───────────────────────────────────────────────────────────────
 
-const PAGE: CaseStudyBlock[] = [
+const PAGE: EditorialBlock[] = [
   {
-    type: "headline",
+    type: "heading",
     kicker: "Harness",
     title: "Everything Here Is Allowed to Fail",
   },
@@ -208,7 +209,7 @@ const PAGE: CaseStudyBlock[] = [
 
   // WHAT RUNS
   {
-    type: "headline",
+    type: "heading",
     title: "What Runs on Every Change",
     text: `${spell(GATES.length).replace(/^./, (c) => c.toUpperCase())} workflows gate a pull request. They are split so the cheap one fails first: CI finishes in about a minute, and there is no point building a static Storybook to screenshot code that does not compile.`,
   },
@@ -217,7 +218,7 @@ const PAGE: CaseStudyBlock[] = [
 
   // THE RULES
   {
-    type: "headline",
+    type: "heading",
     title: `${spell(n.lintRules).replace(/^./, (c) => c.toUpperCase())} Rules That Can Fail`,
     text: "Each one encodes a sentence from the rules file. They are scoped: the token package is deliberately exempt, because it is the one place raw values are allowed to live.",
   },
@@ -239,7 +240,7 @@ const PAGE: CaseStudyBlock[] = [
 
   // THE LAYERS
   {
-    type: "headline",
+    type: "heading",
     title: "The Layers, and What Guards Each One",
     text: "The system is a stack, and each layer has a different failure mode. A token can disagree with itself across two files. A component can hardcode a value. A story can look fine and be unreadable to a screen reader. A consumer can fall behind. One check does not cover four problems.",
   },
@@ -247,7 +248,7 @@ const PAGE: CaseStudyBlock[] = [
 
   // SPECS
   {
-    type: "headline",
+    type: "heading",
     title: "A Spec With a Hash",
     text: `Every component carries a spec. The question a spec cannot answer about itself is whether it is still true, and the first attempt at answering it mechanically was wrong in a way that read as success.`,
   },
@@ -263,7 +264,7 @@ const PAGE: CaseStudyBlock[] = [
 
   // VISUAL
   {
-    type: "headline",
+    type: "heading",
     title: `${n.baselines} Pictures, in Both Themes`,
     text: `Sharp corners, one type family, exact token values: the whole value proposition is visual, and a single token change can alter every component at once. The accessibility pass asserts that a story is usable. It says nothing about whether it still looks right.`,
   },
@@ -292,7 +293,7 @@ const PAGE: CaseStudyBlock[] = [
 
   // A11Y
   {
-    type: "headline",
+    type: "heading",
     title: "Accessibility Runs Twice",
     text: "Dark is the default theme here, which means light is the one that quietly rots. So axe runs over every story once in each theme, on every pull request, not as an audit somebody schedules.",
   },
@@ -303,7 +304,7 @@ const PAGE: CaseStudyBlock[] = [
 
   // LIMITS
   {
-    type: "headline",
+    type: "heading",
     title: "What the Harness Cannot See",
     text: "A green run is a floor, not a guarantee, and the harness is written to say so rather than imply otherwise.",
   },
@@ -327,7 +328,7 @@ const PAGE: CaseStudyBlock[] = [
 
   // WHY LAYER
   {
-    type: "headline",
+    type: "heading",
     title: "The Why-Layer",
     text: `Rules say what to do. They are useless for stopping someone from undoing a decision they never saw. So each one has a record: ${n.decisions} decision records and ${spell(n.insights)} insights, all in the repo, all linked from the rules file.`,
   },
@@ -569,7 +570,7 @@ export default function Harness() {
             block's own `pre[role="img"]`, page-side, so the vendored
             CaseStudy.tsx stays byte-identical to scorp-ds and ds:check keeps
             working. Worth fixing upstream. */}
-        <CaseStudyBlocks
+        <EditorialBlocks
           blocks={PAGE}
           slots={SLOTS}
           className="[&_pre[role=img]]:leading-none"
