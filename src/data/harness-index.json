@@ -19,8 +19,8 @@
     "baselines": 554,
     "lintRules": 8,
     "skills": 19,
-    "decisions": 15,
-    "insights": 4,
+    "decisions": 21,
+    "insights": 5,
     "tokens": 423
   },
   "lintRules": [
@@ -103,7 +103,8 @@
       "note": "Kept separate from storybook-a11y.yml so it fails in ~1 minute instead of waiting on a full static Storybook build.",
       "triggers": [
         "push",
-        "pull_request"
+        "pull_request",
+        "workflow_dispatch"
       ],
       "steps": [
         "Install dependencies",
@@ -111,7 +112,8 @@
         "Lint",
         "Type-check",
         "Unit tests",
-        "API surface manifest is current"
+        "API surface manifest is current",
+        "Specs match the components they describe"
       ],
       "url": "https://github.com/sachahurley/scorp-ds/blob/main/.github/workflows/ci.yml"
     },
@@ -133,13 +135,32 @@
       "url": "https://github.com/sachahurley/scorp-ds/blob/main/.github/workflows/deploy-storybook.yml"
     },
     {
+      "file": "main-health.yml",
+      "name": "main health",
+      "summary": "Keeps one GitHub issue honest about the state of main: opened (or commented",
+      "note": "on) when a check on main fails, closed when everything is green again. You only hear about main when it is broken. See docs/decisions/0019. Report only: this workflow never pushes, never edits code, and needs no secrets beyond the default token. Two ways in: - Whenever CI, Storybook a11y or Deploy Storybook finishes on main. - Weekly, and by hand: the full ds-health.sh plus an npm audit report, which catch what a push cannot (a dependency advisory published since the last merge). The audit is reported in the run summary and does not open the issue until decision 0018's gate is in place.",
+      "triggers": [
+        "workflow_run",
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "steps": [
+        "Install dependencies",
+        "Full health check",
+        "Dependency audit (report only)",
+        "Open, update or close the issue"
+      ],
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/.github/workflows/main-health.yml"
+    },
+    {
       "file": "storybook-a11y.yml",
       "name": "Storybook a11y",
       "summary": "Builds static Storybook, serves it locally, runs @storybook/test-runner + axe on all non-skipped stories.",
       "note": null,
       "triggers": [
         "push",
-        "pull_request"
+        "pull_request",
+        "workflow_dispatch"
       ],
       "steps": [
         "Install dependencies",
@@ -153,19 +174,21 @@
       "file": "visual-regression.yml",
       "name": "Visual regression",
       "summary": "Screenshots every story in both themes and diffs against committed baselines.",
-      "note": "Baselines are platform-specific: font rasterisation differs between macOS and Linux, so a baseline captured on a laptop will never match here. They are generated and compared ONLY in this container. To (re)create them, run this workflow manually with `update` set to true and commit the result.",
+      "note": "Baselines are platform-specific: font rasterisation differs between macOS and Linux, so a baseline captured on a laptop will never match here. They are generated and compared ONLY in this container. Two ways to refresh them (decision 0020): - Put [update-baselines] in the message of a pull request's latest commit. This job then rewrites the frames that changed, commits them to the branch, and re-runs the required checks on that commit. Review the PNGs in the pull request's \"Files changed\" tab; GitHub shows before and after. - Run this workflow by hand with `update` (and `force` for a Chromium or runner upgrade). That uploads the baselines as an artifact to commit by hand, which is the only route for a branch with no pull request.",
       "triggers": [
         "pull_request",
         "workflow_dispatch"
       ],
       "steps": [
+        "Is this a baseline refresh?",
         "Install dependencies",
         "Install Playwright (Chromium)",
         "Build static Storybook",
         "Compare against baselines",
         "Upload diffs",
         "Rewrite baselines",
-        "Upload new baselines"
+        "Upload new baselines",
+        "Refresh baselines and commit them"
       ],
       "url": "https://github.com/sachahurley/scorp-ds/blob/main/.github/workflows/visual-regression.yml"
     }
@@ -256,6 +279,42 @@
       "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0014-case-studies-are-structured-pages.md"
     },
     {
+      "id": "0015",
+      "title": "CI checks are required to merge into main",
+      "affects": "The main ruleset, every PR",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0015-ci-checks-are-required-to-merge.md"
+    },
+    {
+      "id": "0016",
+      "title": "Spec drift fails CI",
+      "affects": "detect-spec-drift.sh, CI, every spec",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0016-spec-drift-is-a-ci-gate.md"
+    },
+    {
+      "id": "0017",
+      "title": "Every component has a story and a test, held by a ratchet",
+      "affects": "coverage.test.ts, every new component",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0017-coverage-is-a-ratchet.md"
+    },
+    {
+      "id": "0018",
+      "title": "Pin actions to commits; Dependabot moves them",
+      "affects": "Every workflow, dependencies",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0018-pin-actions-and-let-dependabot-move-them.md"
+    },
+    {
+      "id": "0019",
+      "title": "The health of main is one GitHub issue",
+      "affects": "main-health.yml, issues",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0019-main-health-is-one-issue.md"
+    },
+    {
+      "id": "0020",
+      "title": "Visual baselines are refreshed by a commit tag",
+      "affects": "Visual regression, every rendered change",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0020-baselines-refresh-by-commit-tag.md"
+    },
+    {
       "id": "0021",
       "title": "Consumers are built against a change before it merges",
       "affects": "check-consumers.mjs, API changes",
@@ -263,6 +322,11 @@
     }
   ],
   "insights": [
+    {
+      "date": "2026-10-27",
+      "title": "The checks were good; nothing made them block",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/insights/2026-10-27-checks-without-a-gate.md"
+    },
     {
       "date": "2026-09-23",
       "title": "Baseline byte churn is anti-aliasing, and the fix is in what --update writes",
