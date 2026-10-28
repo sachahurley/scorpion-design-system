@@ -12,10 +12,10 @@
  * STATES:
  * - default: Standard input appearance
  * - hover: Subtle border change on mouse over
- * - focused: the system's 2px inset ring (`--focus-ring-width`) drawn inside
- *   the plate, on top of the ring wrapper's accent colour. The error state
- *   keeps its red ring wrapper and draws the inset ring in
- *   `--focus-ring-error`, so focus is visible in every state.
+ * - focused: a colour change only. The 1px ring turns `--field-border-focus`
+ *   (the quiet underline does the same); nothing thickens, so the field does
+ *   not look bigger. Focus wins over error, so an errored field still shows
+ *   the change. See docs/decisions/0022.
  * - disabled: the whole field (ring wrapper included) drops to 50% opacity;
  *   dimming only the inner fill used to leave a full-strength border.
  * - error: Red ring to indicate validation issues
@@ -105,14 +105,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       focus:outline-none
     `;
 
-    // FOCUS: the same 2px inset ring Button, Checkbox and ListRow use. It is
-    // drawn on the input (the plate clip swallows outside outlines, and an
-    // inset ring on the 1px wrapper would be painted over by the input).
-    // The error state gets the ring too, in the error colour.
-    const focusRing = error
-      ? "focus-visible:[box-shadow:inset_0_0_0_var(--focus-ring-width)_var(--focus-ring-error)]"
-      : "focus-visible:[box-shadow:inset_0_0_0_var(--focus-ring-width)_var(--focus-ring-primary)]";
-
     // SIZE STYLES - All values matching button sizes from tokens.json
     // Heights match button component exactly: 32px, 40px, 48px
     // Horizontal padding slightly less than buttons for better text alignment
@@ -133,17 +125,20 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     // PLATE RING RECIPE — the wrapper is the border color clipped to the plate;
     // the input is the fill clipped 1px inset. The ring walks the portfolio ramp:
     // idle hairline → hover mut → focus accent (via --field-border-* tokens).
+    // Focus is only this colour change, as in Select and Combobox: no inset
+    // ring on top (docs/decisions/0022). Focus wins over error on the ring, so
+    // an errored field still shows focus; the error stays carried by the fill
+    // and the message below.
     const ringStyles = error
-      ? "bg-[var(--field-border-error)]"
+      ? "bg-[var(--field-border-error)] focus-within:!bg-[var(--field-border-focus)]"
       : "bg-[var(--field-border)] hover:bg-[var(--field-border-hover)] focus-within:!bg-[var(--field-border-focus)]";
 
     // QUIET VARIANT — the underline recipe: no plate, no ring wrapper; the
-    // bottom border itself walks the ramp. Focus thickens the underline to the
-    // focus-ring width with an inset bottom ring (no layout shift), matching
-    // the 2px weight the box variant uses.
+    // bottom border itself walks the ramp. Focus is a colour change on the
+    // same 1px underline, matching the box variant; focus wins over error.
     const quietStyles = error
-      ? "border-b border-[var(--field-border-error)] focus-visible:[box-shadow:inset_0_calc(-1*var(--focus-ring-width))_0_0_var(--focus-ring-error)]"
-      : "border-b border-[var(--field-border)] hover:border-[var(--field-border-hover)] focus:!border-[var(--field-border-focus)] focus-visible:[box-shadow:inset_0_calc(-1*var(--focus-ring-width))_0_0_var(--focus-ring-primary)]";
+      ? "border-b border-[var(--field-border-error)] focus:!border-[var(--field-border-focus)]"
+      : "border-b border-[var(--field-border)] hover:border-[var(--field-border-hover)] focus:!border-[var(--field-border-focus)]";
 
     const inputEl =
       variant === "quiet" ? (
@@ -168,7 +163,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           disabled={disabled}
           aria-invalid={error || undefined}
           aria-describedby={field.describedBy}
-          className={`${baseStyles} ${focusRing} ${sizeStyles[size]} ${stateStyles} ${className}`}
+          className={`${baseStyles} ${sizeStyles[size]} ${stateStyles} ${className}`}
           {...props}
         />
       </div>
