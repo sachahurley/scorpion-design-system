@@ -14,7 +14,7 @@
   "counts": {
     "components": 43,
     "primitives": 7,
-    "specs": 56,
+    "specs": 61,
     "stories": 72,
     "baselines": 554,
     "lintRules": 8,
