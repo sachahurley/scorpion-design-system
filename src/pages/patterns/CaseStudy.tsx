@@ -2,34 +2,39 @@
  * CASE STUDY PAGE
  *
  * "Building the Scorpion Design System" - the story of how this system was
- * built, authored as a typed CaseStudyBlock array and rendered by
- * CaseStudyBlocks. A first draft: the narrative skeleton (meta, headline,
- * prose, insights, quote) is real and ready for Sacha to flesh out.
+ * built: a CaseStudyHeader (title, summary, meta) over one run of
+ * CaseStudyContent blocks (prose, insights, quote). A first draft: when the
+ * story gains named sections, move it to CaseStudyPage and they number
+ * themselves.
  *
- * The full block-library documentation this page used to hold now lives in
- * the deployed Storybook (Patterns/CaseStudyBlocks).
+ * The full block-library documentation lives in the deployed Storybook
+ * (Patterns/CaseStudy).
  */
 
 import { Link as RouterLink } from "react-router-dom";
-import { CaseStudyBlocks, type CaseStudyBlock } from "@/components/ui/CaseStudy";
+import {
+  CaseStudyContent,
+  CaseStudyHeader,
+  type CaseStudy,
+  type CaseStudyContentBlock,
+} from "@/components/ui/CaseStudy";
 import { Link } from "@/components/ui/Link";
 
-// The case study, section by section. Blocks render in array order.
-const STUDY: CaseStudyBlock[] = [
-  {
-    type: "meta",
-    items: [
-      { label: "Role", value: "Designer & Builder" },
-      { label: "Timeline", value: "2025-2026" },
-      { label: "Team", value: "Sacha + AI agents" },
-    ],
-  },
-  {
-    type: "headline",
-    kicker: "Case study",
-    title: "Building the Scorpion Design System",
-    text: "A TUI-inspired design system built tokens-first, maintained by AI agents working inside written rules, and shipped to its consumers as vendored code.",
-  },
+// The page header: title, one-line summary, and the label/value meta rows.
+const HEADER: Pick<CaseStudy, "title" | "summary" | "meta"> = {
+  title: "Building the Scorpion Design System",
+  summary:
+    "A TUI-inspired design system built tokens-first, maintained by AI agents working inside written rules, and shipped to its consumers as vendored code.",
+  meta: [
+    { label: "Role", value: "Designer & Builder" },
+    { label: "Timeline", value: "2025-2026" },
+    { label: "Team", value: "Sacha + AI agents" },
+  ],
+};
+
+// The story itself, in reading order. It has no named sections, so it
+// renders as one run of content under the header rather than numbered ones.
+const STUDY: CaseStudyContentBlock[] = [
   {
     type: "prose",
     text: "The system started with tokens, not components. Every color, type size, spacing step, and motion duration lives in a single W3C-format JSON file, organized in three layers: global scales (amber, sepia, and the status hues), then light and dark semantic layers that map those scales onto surfaces, text, and focus. The JSON and the CSS custom properties beside it are both written by hand, on purpose: the CSS carries measured contrast ratios and one documented exception that no generator would reproduce, and a unit test fails the build the moment the two disagree. Components reference only semantic names like primary-400 or surface-card. The rule that made it stick: raw values are allowed in exactly one file, and everything downstream is a reference.",
@@ -84,7 +89,8 @@ export default function CaseStudyPage() {
     <div className="container mx-auto px-5 lg:px-10 pt-5 lg:pt-10 pb-5 lg:pb-20">
       {/* Reading column: breakout figures size against this inline-size container */}
       <div className="mx-auto max-w-2xl [container-type:inline-size]">
-        <CaseStudyBlocks blocks={STUDY} />
+        <CaseStudyHeader study={HEADER} />
+        <CaseStudyContent blocks={STUDY} className="mt-12" />
 
         {/* Outbound links: the block vocabulary has no link block, so they
             live in a footer row matching the Home, Skills and Harness pages */}

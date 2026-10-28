@@ -16,12 +16,12 @@
     "primitives": 7,
     "specs": 56,
     "stories": 72,
-    "baselines": 542,
+    "baselines": 554,
     "lintRules": 8,
     "skills": 19,
-    "decisions": 13,
+    "decisions": 15,
     "insights": 4,
-    "tokens": 422
+    "tokens": 423
   },
   "lintRules": [
     {
@@ -248,6 +248,18 @@
       "title": "--update writes only the baselines that changed",
       "affects": "Visual regression, baseline refreshes",
       "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0013-update-writes-only-changed-baselines.md"
+    },
+    {
+      "id": "0014",
+      "title": "Case studies are structured pages, not block lists",
+      "affects": "CaseStudy, the portfolio's case studies",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0014-case-studies-are-structured-pages.md"
+    },
+    {
+      "id": "0021",
+      "title": "Consumers are built against a change before it merges",
+      "affects": "check-consumers.mjs, API changes",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0021-consumers-are-built-before-merge.md"
     }
   ],
   "insights": [

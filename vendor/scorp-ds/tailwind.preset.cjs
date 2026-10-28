@@ -310,6 +310,7 @@ module.exports = {
         '4xl': 'var(--font-size-4xl)',
         '5xl': 'var(--font-size-5xl)',
         '6xl': 'var(--font-size-6xl)',
+        'page-title': 'var(--font-size-page-title)',
       },
     },
   },

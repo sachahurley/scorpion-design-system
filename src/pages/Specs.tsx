@@ -11,12 +11,13 @@
  * src/data/specs-index.json (name, status, category, first sentence of the
  * intent, GitHub URL). ds:check flags drift when a spec is added or changes.
  *
- * Page structure follows the Essay/Case Study editorial layout: headline
- * and prose via CaseStudyBlocks, with DS Table and ListRow for the spec
+ * Page structure follows the Case Study editorial layout: the title and
+ * summary via CaseStudyHeader, with DS Table and ListRow for the spec
  * anatomy and index (content the block vocabulary doesn't cover).
  */
 
-import { CaseStudyBlocks, type CaseStudyBlock } from "@/components/ui/CaseStudy";
+import { EditorialHeadingView } from "@/components/docs/EditorialBlocks";
+import { CaseStudyHeader, type CaseStudy } from "@/components/ui/CaseStudy";
 import { Link } from "@/components/ui/Link";
 import { ListRow } from "@/components/ui/ListRow";
 import { TuiIcon } from "@/components/ui/TuiIcon";
@@ -56,32 +57,16 @@ const countIn = (title: string) => index.groups.find((g) => g.title === title)?.
 // The worked example: the Link spec (status fields read live from the index)
 const LINK_SPEC = allSpecs.find((s) => s.name === "Link");
 
-const INTRO: CaseStudyBlock[] = [
-  {
-    type: "headline",
-    kicker: "Specs",
-    title: "Every Part Has a Paper Trail",
-  },
-  {
-    type: "prose",
-    text: "Every component, primitive, and pattern in Scorp DS has a spec: a markdown file in the repo covering its status, intent, anatomy, properties, token usage, states, Storybook coverage, accessibility contract, and usage rules. Specs are written from the source and kept current by the /update-spec skill, which preserves human-written sections across regenerations. The repo copy is the only copy: every link on this page opens the spec on GitHub.",
-  },
-  {
-    type: "headline",
-    title: "Anatomy of a Spec",
-    text: "The Link spec, abbreviated to its key sections.",
-  },
-];
+// The page header: the title and the one-paragraph summary.
+const HEADER: Pick<CaseStudy, "title" | "summary"> = {
+  title: "Every Part Has a Paper Trail",
+  summary:
+    "Every component, primitive, and pattern in Scorp DS has a spec: a markdown file in the repo covering its status, intent, anatomy, properties, token usage, states, Storybook coverage, accessibility contract, and usage rules. Specs are written from the source and kept current by the /update-spec skill, which preserves human-written sections across regenerations. The repo copy is the only copy: every link on this page opens the spec on GitHub.",
+};
 
-const INDEX_HEADER: CaseStudyBlock[] = [
-  {
-    type: "headline",
-    title: "All Specs",
-    text: `The full index: ${countIn("Components and primitives")} components and primitives, ${countIn("Patterns")} patterns, and ${countIn("Foundation and meta")} foundation and meta specs. It is generated from the spec files each time the design system is vendored, and each row opens that spec on GitHub.`,
-  },
-];
+const INDEX_TEXT = `The full index: ${countIn("Components and primitives")} components and primitives, ${countIn("Patterns")} patterns, and ${countIn("Foundation and meta")} foundation and meta specs. It is generated from the spec files each time the design system is vendored, and each row opens that spec on GitHub.`;
 
-// Text tones matching the CaseStudyBlocks body treatment
+// Text tones matching the CaseStudy body treatment
 const BODY_TEXT = "text-sm font-mono text-secondary-800 dark:text-secondary-500";
 const HEADING_TEXT = "text-sm font-mono text-[var(--text-primary)]";
 const MUTED_CELL = "text-secondary-700 dark:text-secondary-600";
@@ -117,7 +102,13 @@ export default function Specs() {
     <div className="container mx-auto px-5 lg:px-10 pt-5 lg:pt-10 pb-5 lg:pb-20">
       {/* Reading column: same editorial width as Essay and Case Study */}
       <div className="mx-auto max-w-2xl [container-type:inline-size]">
-        <CaseStudyBlocks blocks={INTRO} />
+        <CaseStudyHeader study={HEADER} />
+        <div className="mt-16">
+          <EditorialHeadingView
+            heading={{ title: "Anatomy of a Spec", text: "The Link spec, abbreviated to its key sections." }}
+            level={2}
+          />
+        </div>
 
         {/* EXAMPLE SPEC: curated sections of docs/specs/Link.md */}
         <div className="mt-8">
@@ -227,10 +218,9 @@ export default function Specs() {
           </p>
         </div>
 
-        {/* THE INDEX (top margin: a fresh block array starts without the
-            inter-section spacing the renderer adds between sibling blocks) */}
+        {/* THE INDEX */}
         <div className="mt-16">
-          <CaseStudyBlocks blocks={INDEX_HEADER} />
+          <EditorialHeadingView heading={{ title: "All Specs", text: INDEX_TEXT }} level={2} />
         </div>
         <div className="mt-6">
           {index.groups.map((group) => (
