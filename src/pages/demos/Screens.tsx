@@ -24,14 +24,14 @@ import { Select } from "@/components/ui/Select";
 import { Divider } from "@/components/ui/Divider";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
-import { TuiIcon } from "@/components/ui/TuiIcon";
+import { TuiIcon, type TuiIconName } from "@/components/ui/TuiIcon";
 import { Panel } from "@/components/docs/Panel";
 import { Link } from "@/components/ui/Link";
 
 // The shell's three destinations. Icon names are TuiIcon glyph keys.
 type ScreenId = "sign-in" | "settings" | "profile";
 
-const SCREENS: { id: ScreenId; label: string; icon: string }[] = [
+const SCREENS: { id: ScreenId; label: string; icon: TuiIconName }[] = [
   { id: "sign-in", label: "Sign In", icon: "Lock" },
   { id: "settings", label: "Settings", icon: "Settings" },
   { id: "profile", label: "Profile", icon: "User" },
