@@ -17,11 +17,11 @@
     "specs": 61,
     "stories": 72,
     "baselines": 554,
-    "lintRules": 16,
+    "lintRules": 17,
     "skills": 19,
     "decisions": 27,
     "insights": 6,
-    "tokens": 423
+    "tokens": 427
   },
   "lintRules": [
     {
@@ -133,6 +133,14 @@
     {
       "name": "scorp/prop-jsdoc",
       "description": "Every member of an exported *Props interface or type has a JSDoc comment. JSDoc on the prop is what autodocs, the IDE and api-surface.json read; @param on the function reaches none of them.",
+      "appliesTo": [
+        "packages/components/src/**/*.{ts,tsx}"
+      ],
+      "enabled": true
+    },
+    {
+      "name": "scorp/no-off-scale-spacing",
+      "description": "Padding, margin, gap and space utilities use a step from global.spacing (whole or half). Tailwind's own extra steps (7, 9, 11, 14, 28, …) are not tokens. Decision 0027.",
       "appliesTo": [
         "packages/components/src/**/*.{ts,tsx}"
       ],
