@@ -129,7 +129,7 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row gap-2">
             <Button
               variant="primary"
-              size="large"
+              size="lg"
               href={STORYBOOK_URL}
               target="_blank"
               rel="noopener noreferrer"
@@ -149,7 +149,7 @@ export default function Home() {
             </Button>
             <Button
               variant="secondary"
-              size="large"
+              size="lg"
               href="https://github.com/sachahurley/scorpion-design-system"
               target="_blank"
               rel="noopener noreferrer"

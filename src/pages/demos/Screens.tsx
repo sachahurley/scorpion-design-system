@@ -96,7 +96,7 @@ function SignInView() {
         title="Signed In"
         subtitle="Authentication succeeded (demo only, nothing was sent)"
         footerContent={
-          <Button variant="secondary" size="medium" onClick={handleSignOut}>
+          <Button variant="secondary" size="md" onClick={handleSignOut}>
             Sign Out
           </Button>
         }
@@ -117,7 +117,7 @@ function SignInView() {
       subtitle="Enter your credentials to access your account"
       footerContent={
         <div className="flex justify-end">
-          <Button variant="primary" size="medium" onClick={handleSignIn}>
+          <Button variant="primary" size="md" onClick={handleSignIn}>
             Sign In
           </Button>
         </div>
@@ -137,7 +137,7 @@ function SignInView() {
               if (errors.email) setErrors({ ...errors, email: undefined });
             }}
             error={!!errors.email}
-            size="medium"
+            size="md"
           />
           {errors.email && (
             <p className="mt-1 text-xs font-mono text-error-600 dark:text-error-500">
@@ -160,7 +160,7 @@ function SignInView() {
                 if (errors.password) setErrors({ ...errors, password: undefined });
               }}
               error={!!errors.password}
-              size="medium"
+              size="md"
               className="pr-10"
             />
             <button
@@ -224,7 +224,7 @@ function SettingsView() {
           hideLabel
         />
       )}
-      <Divider spacing="medium" />
+      <Divider spacing="md" />
       {row(
         "Push notifications",
         "Build results as they land",
@@ -235,13 +235,13 @@ function SettingsView() {
           hideLabel
         />
       )}
-      <Divider spacing="medium" />
+      <Divider spacing="md" />
       {row(
         "Autoplay",
         "Start the music player on open",
         <Switch checked={autoplay} onCheckedChange={setAutoplay} label="Autoplay" hideLabel />
       )}
-      <Divider spacing="medium" />
+      <Divider spacing="md" />
       {row(
         "Language",
         "Interface language",
@@ -249,7 +249,7 @@ function SettingsView() {
           <Select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
-            size="medium"
+            size="md"
             aria-label="Language"
           >
             <option value="en">English</option>
@@ -279,7 +279,7 @@ function ProfileView() {
       }
     >
       <div className="flex items-start gap-4">
-        <Avatar initials="SH" size="large" status="online" alt="Sacha Hurley" />
+        <Avatar initials="SH" size="lg" status="online" alt="Sacha Hurley" />
         <div>
           <p className="text-base font-mono text-[var(--text-primary)]">Sacha Hurley</p>
           <p className="text-sm font-mono text-secondary-800 dark:text-secondary-500 mb-3">
