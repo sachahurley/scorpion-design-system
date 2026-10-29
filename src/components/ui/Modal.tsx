@@ -72,13 +72,21 @@ function dockedMediaQuery(): string {
 }
 
 /**
- * Panel width per `size`. `lg` (740px) is the long-standing default; `md` is
- * the docked compare card; `sm` fits a short confirmation or a celebratory
- * notice; `full` asks for the whole viewport and is capped by `max-w-full`
- * (the scrim padding, or the viewport when docked). There are no width
- * tokens: like the old `width` default, these are component geometry.
+ * Panel width per `size`, a five-step scale chosen from the widths consumers
+ * actually use. `xl` (740px) is the long-standing default; `lg` is the docked
+ * compare card; `md` a picker or a short form; `sm` a confirmation; `xs` a
+ * celebratory notice. `full` asks for the whole viewport and is capped by
+ * `max-w-full` (the scrim padding, or the viewport when docked). There are no
+ * width tokens: like the old `width` default, these are component geometry.
  */
-const MODAL_WIDTHS = { sm: "360px", md: "640px", lg: "740px", full: "100vw" } as const;
+const MODAL_WIDTHS = {
+  xs: "320px",
+  sm: "360px",
+  md: "440px",
+  lg: "640px",
+  xl: "740px",
+  full: "100vw",
+} as const;
 
 export interface ModalProps {
   /**
@@ -107,12 +115,13 @@ export interface ModalProps {
    */
   footerContent?: ReactNode;
   /**
-   * Panel width: `sm` (360px) for a short confirmation or notice, `md`
-   * (640px) for a compare card or a short form, `lg` (740px, the default
-   * when neither `size` nor `width` is passed) for a full task, `full` for
-   * the whole viewport width. The panel never grows past the viewport.
+   * Panel width: `xs` (320px) for a one-line notice or reward, `sm` (360px)
+   * for a confirmation, `md` (440px) for a picker or short form, `lg` (640px)
+   * for a compare card or a form with sections, `xl` (740px, the default when
+   * neither `size` nor `width` is passed) for a full task, `full` for the whole
+   * viewport width. The panel never grows past the viewport.
    */
-  size?: "sm" | "md" | "lg" | "full";
+  size?: "xs" | "sm" | "md" | "lg" | "xl" | "full";
   /**
    * @deprecated Use `size`. Still honoured when `size` is not passed:
    * numbers are px, strings pass through.
@@ -156,10 +165,10 @@ export function Modal({
     setOpenState(false);
   }, [isOpen, setOpenState]);
 
-  // `size` wins over the deprecated `width`; with neither, the panel is `lg`.
+  // `size` wins over the deprecated `width`; with neither, the panel is `xl`.
   const panelWidth =
     size !== undefined || width === undefined
-      ? MODAL_WIDTHS[size ?? "lg"]
+      ? MODAL_WIDTHS[size ?? "xl"]
       : typeof width === "number"
         ? `${width}px`
         : width;
