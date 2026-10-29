@@ -113,7 +113,7 @@ export function TopBar({ isMobileMenuOpen, toggleMobileMenu, isMusicPlayerOpen, 
           <Button
             onClick={isMusicPlayerOpen ? closeMusicPlayer : openMusicPlayer}
             variant="outline"
-            size="small"
+            size="sm"
             className={isMusicPlayerOpen ? "bg-secondary-200 dark:bg-secondary-700" : ""}
             aria-label={isMusicPlayerOpen ? "Close music player" : "Open music player"}
           >

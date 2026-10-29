@@ -43,7 +43,7 @@ export function LightModeNotice() {
       title="Under construction"
       size="sm"
       footerContent={
-        <Button variant="primary" size="medium" onClick={() => setIsOpen(false)}>
+        <Button variant="primary" size="md" onClick={() => setIsOpen(false)}>
           Got it
         </Button>
       }
