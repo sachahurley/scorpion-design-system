@@ -40,7 +40,7 @@
           "story": "Components/Navigation/AppHeader",
           "updated": "2026-09-22",
           "component": "AppHeader (import from @scorp-ds/components)",
-          "summary": "APP HEADER COMPONENT (top bar)"
+          "summary": "The application top bar: a <header> with brand, navigation, and actions"
         },
         {
           "name": "Avatar",
@@ -100,7 +100,7 @@
           "story": "Components/Navigation/Breadcrumbs",
           "updated": "2026-10-28",
           "component": "Breadcrumbs (import from @scorp-ds/components)",
-          "summary": "BREADCRUMBS COMPONENT"
+          "summary": "Shows where the current page sits in a hierarchy: a <nav aria-label=\"Breadcrumb\">"
         },
         {
           "name": "Button",
@@ -220,7 +220,7 @@
           "story": "Components/Terminal/DescriptionList",
           "updated": "2026-09-22",
           "component": "DescriptionList (import from @scorp-ds/components)",
-          "summary": "DESCRIPTION LIST COMPONENT (key / value)"
+          "summary": "Term and value pairs on a real <dl>: metadata panels, config readouts,"
         },
         {
           "name": "Divider",
@@ -316,7 +316,7 @@
           "story": "Components/Terminal/Kbd",
           "updated": "2026-10-29",
           "component": "Kbd (import from @scorp-ds/components)",
-          "summary": "KBD COMPONENT"
+          "summary": "Inline keyboard key for shortcut hints."
         },
         {
           "name": "Link",
@@ -352,7 +352,7 @@
           "story": "Components/Terminal/LogView",
           "updated": "2026-10-29",
           "component": "LogView (import from @scorp-ds/components)",
-          "summary": "LOG VIEW COMPONENT"
+          "summary": "A monospace scrolling log: build output, server logs, job runs."
         },
         {
           "name": "Message",
@@ -376,7 +376,7 @@
           "story": "Components/Terminal/Meter",
           "updated": "2026-10-29",
           "component": "Meter (import from @scorp-ds/components)",
-          "summary": "METER COMPONENT"
+          "summary": "A gauge for a value in a known range (disk, quota, battery), not a progress"
         },
         {
           "name": "Modal",
@@ -400,7 +400,7 @@
           "story": "Components/Navigation/Pagination",
           "updated": "2026-10-29",
           "component": "Pagination (import from @scorp-ds/components)",
-          "summary": "PAGINATION COMPONENT"
+          "summary": "Page picker for long, paged collections."
         },
         {
           "name": "Popover",
@@ -460,7 +460,7 @@
           "story": "Components/Navigation/SideNav",
           "updated": "2026-10-28",
           "component": "SideNav (import from @scorp-ds/components)",
-          "summary": "SIDE NAV COMPONENT (navigation rail)"
+          "summary": "The Patterns/SideNavigation recipe as a compound component: SideNav >"
         },
         {
           "name": "Skeleton",
@@ -520,7 +520,7 @@
           "story": "Components/Terminal/StatusLine",
           "updated": "2026-09-22",
           "component": "StatusLine (import from @scorp-ds/components)",
-          "summary": "STATUS LINE COMPONENT (status bar)"
+          "summary": "The bottom bar of a terminal app (vim, tmux): left, center, and right"
         },
         {
           "name": "Switch",
@@ -628,7 +628,7 @@
           "story": "Components/Terminal/TreeView",
           "updated": "2026-10-29",
           "component": "TreeView (import from @scorp-ds/components)",
-          "summary": "TREE VIEW COMPONENT"
+          "summary": "Hierarchical list with expandable branches (file trees, outlines)."
         },
         {
           "name": "TuiIcon",
@@ -664,7 +664,7 @@
           "story": "Components/Terminal/Window",
           "updated": "2026-09-22",
           "component": "Window (import from @scorp-ds/components)",
-          "summary": "WINDOW COMPONENT (pane)"
+          "summary": "A framed terminal pane: the large plate ring (stroke layer + fill inset 1px),"
         }
       ]
     },
