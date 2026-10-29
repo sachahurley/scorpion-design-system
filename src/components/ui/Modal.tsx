@@ -45,7 +45,6 @@ import { Button } from "./Button";
 import { TuiIcon } from "./TuiIcon";
 import { useFocusTrap } from "@/lib/use-focus-trap";
 import { useControllableState } from "@/lib/use-controllable-state";
-import { warnDeprecated } from "@/lib/deprecate";
 
 /**
  * Value of `global.breakpoint.docked` in tokens.json, used only where the
@@ -77,7 +76,7 @@ function dockedMediaQuery(): string {
  * compare card; `md` a picker or a short form; `sm` a confirmation; `xs` a
  * celebratory notice. `full` asks for the whole viewport and is capped by
  * `max-w-full` (the scrim padding, or the viewport when docked). There are no
- * width tokens: like the old `width` default, these are component geometry.
+ * width tokens: these are component geometry.
  */
 const MODAL_WIDTHS = {
   xs: "320px",
@@ -118,15 +117,10 @@ export interface ModalProps {
    * Panel width: `xs` (320px) for a one-line notice or reward, `sm` (360px)
    * for a confirmation, `md` (440px) for a picker or short form, `lg` (640px)
    * for a compare card or a form with sections, `xl` (740px, the default when
-   * neither `size` nor `width` is passed) for a full task, `full` for the whole
+   * no `size` is passed) for a full task, `full` for the whole
    * viewport width. The panel never grows past the viewport.
    */
   size?: "xs" | "sm" | "md" | "lg" | "xl" | "full";
-  /**
-   * @deprecated Use `size`. Still honoured when `size` is not passed:
-   * numbers are px, strings pass through.
-   */
-  width?: number | string;
   /**
    * Dock instead of covering: at or above the `--breakpoint-docked` token
    * (960px) the panel pins bottom-center with no scrim and no scroll lock (a
@@ -148,10 +142,8 @@ export function Modal({
   children,
   footerContent,
   size,
-  width,
   docked = false,
 }: ModalProps) {
-  if (width !== undefined) warnDeprecated("Modal", "width", "size");
 
   // Passing `open` makes the dialog controlled.
   const [isOpen, setOpenState] = useControllableState({
@@ -165,13 +157,7 @@ export function Modal({
     setOpenState(false);
   }, [isOpen, setOpenState]);
 
-  // `size` wins over the deprecated `width`; with neither, the panel is `xl`.
-  const panelWidth =
-    size !== undefined || width === undefined
-      ? MODAL_WIDTHS[size ?? "xl"]
-      : typeof width === "number"
-        ? `${width}px`
-        : width;
+  const panelWidth = MODAL_WIDTHS[size ?? "xl"];
 
   const panelRef = useRef<HTMLDivElement>(null);
   const prevFocusRef = useRef<HTMLElement | null>(null);
