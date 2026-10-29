@@ -12,14 +12,14 @@
     "baselines": "https://github.com/sachahurley/scorp-ds/tree/main/packages/storybook/visual-baselines"
   },
   "counts": {
-    "components": 43,
+    "components": 44,
     "primitives": 7,
-    "specs": 64,
-    "stories": 72,
-    "baselines": 562,
+    "specs": 65,
+    "stories": 73,
+    "baselines": 582,
     "lintRules": 17,
     "skills": 19,
-    "decisions": 31,
+    "decisions": 32,
     "insights": 6,
     "tokens": 427
   },
@@ -477,6 +477,12 @@
       "title": "The 0024 aliases are removed; Modal width stays",
       "affects": "Every component that carried an alias, lib/size.ts",
       "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0031-the-0024-aliases-are-removed.md"
+    },
+    {
+      "id": "0032",
+      "title": "A responsive prop takes a breakpoint map, and only where a pattern needs one",
+      "affects": "Stack axis and align, Grid columns, future responsive props",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0032-responsive-props-take-a-breakpoint-map.md"
     }
   ],
   "insights": [

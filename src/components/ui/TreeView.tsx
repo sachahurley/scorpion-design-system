@@ -21,6 +21,14 @@
  * STATE: `expanded` and `selected` are each controlled or uncontrolled
  * (`defaultExpanded` / `defaultSelected`).
  *
+ * DATA STATES (same names as TableBody):
+ * - `loading`: the tree keeps its role and name, gains `aria-busy`, and shows
+ *   three Skeleton rows hidden from assistive tech in place of the nodes.
+ * - `emptyState`: with no nodes, renders in place of the tree inside a named
+ *   `role="group"`, because a tree with no treeitems is invalid ARIA. With
+ *   no `emptyState` and no nodes, TreeView renders nothing: it cannot tell
+ *   "empty" from "not loaded yet", so it does not claim either.
+ *
  * DISCLOSURE ICONS: 1-bit ChevronRight (closed) and ChevronDown (open).
  *
  * TOKENS USED:
@@ -40,6 +48,7 @@ import {
 } from "react";
 import { cn } from "@/lib/utils";
 import { TuiIcon } from "./TuiIcon";
+import { Skeleton } from "./Skeleton";
 import { renderIconSlot, type IconSlot } from "@/lib/icon-slot";
 
 /** One node of the tree. Nodes with `children` are branches. */
@@ -82,6 +91,17 @@ interface TreeViewOwnProps {
   onActivate?: (id: string) => void;
   /** Type-ahead on printable keys (default true). */
   typeahead?: boolean;
+  /**
+   * Set while the nodes are on their way: three Skeleton rows replace the nodes and
+   * the tree gets `aria-busy` until it is false again. Wins over `emptyState`.
+   */
+  loading?: boolean;
+  /**
+   * What to show when `nodes` is empty: a sentence, or an `EmptyState size="sm"` with
+   * `titleAs="p"`. It renders in place of the tree, in a `role="group"` carrying the
+   * tree's name. Without it an empty tree renders nothing. Ignored while `loading`.
+   */
+  emptyState?: ReactNode;
   /** Extra classes for the tree root. */
   className?: string;
 }
@@ -107,6 +127,9 @@ function textOf(node: TreeNode): string {
   return typeof node.label === "string" || typeof node.label === "number" ? String(node.label) : "";
 }
 
+// Widths of the loading placeholders, varied so they read as labels, not bars.
+const LOADING_WIDTHS = ["w-3/5", "w-2/5", "w-1/2"] as const;
+
 const ROW =
   "plate-round flex min-h-touch cursor-pointer items-center gap-2 py-1 pr-3 font-mono text-sm " +
   "pl-[calc(var(--tree-level)_*_theme(spacing.4)_+_theme(spacing.2))] " +
@@ -114,6 +137,8 @@ const ROW =
 
 /**
  * TreeView
+ *
+ * Pass `loading` while the nodes load and `emptyState` for when there are none.
  *
  * ```tsx
  * <TreeView
@@ -136,6 +161,8 @@ export function TreeView({
   onSelectedChange,
   onActivate,
   typeahead = true,
+  loading = false,
+  emptyState,
   className,
 }: TreeViewProps) {
   const [expandedState, setExpandedState] = useState<string[]>(defaultExpanded);
@@ -333,14 +360,45 @@ export function TreeView({
       );
     });
 
+  // A tree must own treeitems, so an empty one is not rendered as a tree: the empty
+  // content takes its place in a group that keeps the tree's name.
+  if (!loading && nodes.length === 0) {
+    if (emptyState == null) return null;
+    return (
+      <div
+        role="group"
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledBy}
+        data-tree-empty=""
+        className={cn("font-mono text-sm", className)}
+      >
+        {emptyState}
+      </div>
+    );
+  }
+
   return (
     <ul
       role="tree"
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledBy}
+      aria-busy={loading || undefined}
       className={cn("font-mono text-sm", className)}
     >
-      {renderNodes(nodes, 1, null)}
+      {loading
+        ? // Placeholder rows carry no meaning, so they are hidden from assistive tech;
+          // aria-busy on the tree is what says the nodes are on their way.
+          LOADING_WIDTHS.map((width) => (
+            <li key={width} role="none" data-tree-loading-row="">
+              <div aria-hidden="true" className="flex min-h-touch items-center gap-2 py-1 pl-2 pr-3">
+                <span className="w-4 shrink-0" />
+                <div className={width}>
+                  <Skeleton />
+                </div>
+              </div>
+            </li>
+          ))
+        : renderNodes(nodes, 1, null)}
     </ul>
   );
 }
