@@ -38,7 +38,7 @@
  */
 
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
-import { resolveSize, type ControlSize, type ControlSizeProp } from "@/lib/size";
+import type { ControlSize } from "@/lib/size";
 import { useControllableState } from "@/lib/use-controllable-state";
 import { renderIconSlot, type IconSlot } from "@/lib/icon-slot";
 
@@ -52,7 +52,7 @@ interface SwitchOwnProps
   /** Called with the next value when the user clicks the track or label, or presses Space or Enter. A controlled switch cannot change without it. */
   onCheckedChange?: (checked: boolean) => void;
   /** Track size. The tap target is at least 44px tall at every size. */
-  size?: ControlSizeProp;
+  size?: ControlSize;
   /** Visible label and accessible name; one of `label`, `aria-label` or `aria-labelledby` is required. Clicking it toggles the switch. Use `hideLabel` to keep it aria-only. */
   label?: string;
   /** Accessible name when there is no `label` (a theme toggle whose state is shown by an icon). Wins over `label` when both are set. */
@@ -124,7 +124,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
       checked: checkedProp,
       defaultChecked = false,
       onCheckedChange,
-      size: sizeProp = "md",
+      size = "md",
       label,
       "aria-label": ariaLabel,
       hideLabel = false,
@@ -135,7 +135,6 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
     },
     ref
   ) => {
-    const size = resolveSize(sizeProp, "Switch");
     const geometry = SWITCH_GEOMETRY[size];
 
     // Controlled when `checked` is set; otherwise the switch keeps its own

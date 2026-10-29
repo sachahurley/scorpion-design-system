@@ -25,7 +25,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { resolveSize, type ControlSizeProp } from "@/lib/size";
+import type { ControlSize } from "@/lib/size";
 import { cn } from "@/lib/utils";
 
 /** Ring dot origins on the 8x8 grid, clockwise from the top-left corner. */
@@ -69,7 +69,7 @@ function usePrefersReducedMotion(): boolean {
 
 export interface SpinnerProps {
   /** Box size: sm 12px (inline, 32px controls), md 16px (default), lg 24px (48px controls, empty states). */
-  size?: ControlSizeProp;
+  size?: ControlSize;
   /**
    * What is loading, read by screen readers and never shown (default "Loading").
    * Be specific when several things load at once: "Loading invoices".
@@ -90,8 +90,7 @@ export interface SpinnerProps {
  * @param label - Visually hidden status text (default: "Loading")
  * @param className - Extra wrapper classes (color, margin)
  */
-export function Spinner({ size: sizeProp = "md", label = "Loading", className }: SpinnerProps) {
-  const size = resolveSize(sizeProp, "Spinner");
+export function Spinner({ size = "md", label = "Loading", className }: SpinnerProps) {
   const reducedMotion = usePrefersReducedMotion();
   const [frame, setFrame] = useState(0);
 

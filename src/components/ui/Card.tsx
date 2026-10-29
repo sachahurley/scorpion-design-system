@@ -17,7 +17,6 @@
  */
 
 import { type ReactNode } from "react";
-import { warnDeprecated } from "@/lib/deprecate";
 
 /** How the card distributes its sections vertically. */
 export type CardLayout = "block" | "flex";
@@ -48,17 +47,13 @@ export interface CardProps {
    * Section layout. `block` (default) lets the card grow with its content.
    * `flex` makes the card a flex column whose content section fills the
    * remaining height, so a fixed-height card can pin its footer to the
-   * bottom. Pass it explicitly: when it is omitted, a standalone `flex` class in
-   * `className` still switches the card to `flex` (legacy behaviour), and that
-   * inference logs a one-time development warning asking for `layout="flex"`.
+   * bottom. A `flex` class in `className` does not switch the layout: pass
+   * `layout="flex"`.
    */
   layout?: CardLayout;
   /** Additional CSS classes (width, height, margin). */
   className?: string;
 }
-
-/** Matches a standalone `flex` class, not `inline-flex` / `flex-1` / `flex-wrap`. */
-const BARE_FLEX_CLASS = /(?:^|\s)flex(?:\s|$)/;
 
 /**
  * Groups related content on a raised surface, with an optional header (title and subtitle) and a footer for actions.
@@ -77,17 +72,10 @@ export function Card({
   headerContent,
   children,
   footerContent,
-  layout,
+  layout = "block",
   className = "",
 }: CardProps) {
-  // LAYOUT: `layout` is the supported switch. With no `layout` the card falls
-  // back to the legacy behaviour for compatibility, but only for a standalone
-  // `flex` class: the old `className.includes('flex')` test also fired on
-  // `inline-flex`, `flex-1` and `flex-wrap`, silently turning plain cards into
-  // flex columns. Pass `layout="flex"` in new code.
-  const inferredFlex = !layout && BARE_FLEX_CLASS.test(className);
-  if (inferredFlex) warnDeprecated("Card", 'inferring layout from a `flex` class in className', 'layout="flex"');
-  const isFlexLayout = layout ? layout === "flex" : inferredFlex;
+  const isFlexLayout = layout === "flex";
 
   // PLATE RING RECIPE — outer layer is the stroke clipped to the large plate,
   // inner layer is the card fill clipped 1px inset. Note: the clip bounds any

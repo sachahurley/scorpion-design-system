@@ -24,7 +24,7 @@
 
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { resolveSize, type ControlSize, type ControlSizeProp } from "@/lib/size";
+import type { ControlSize } from "@/lib/size";
 import { TuiIcon, type TuiIconSize } from "./TuiIcon";
 
 /** A page number, or a skipped gap rendered as an ellipsis. */
@@ -101,7 +101,7 @@ export interface PaginationProps {
   /** Pages always shown at the start and end (default 1). */
   boundaryCount?: number;
   /** Plate height from the Button scale: sm 32px, md 40px (default), lg 48px. Hit areas stay 44px or more. */
-  size?: ControlSizeProp;
+  size?: ControlSize;
   /** Show the previous/next arrow buttons (default true). */
   showPrevNext?: boolean;
   /** Accessible name of each page button (default "Page 3"). */
@@ -193,7 +193,7 @@ export function Pagination({
   onPageChange,
   siblingCount = 1,
   boundaryCount = 1,
-  size: sizeProp = "md",
+  size = "md",
   showPrevNext = true,
   getPageLabel = (p) => `Page ${p}`,
   previousLabel = "Previous page",
@@ -201,7 +201,6 @@ export function Pagination({
   "aria-label": ariaLabel = "Pagination",
   className,
 }: PaginationProps) {
-  const size = resolveSize(sizeProp, "Pagination");
   const [uncontrolled, setUncontrolled] = useState(defaultPage);
   const isControlled = pageProp !== undefined;
   const rawPage = isControlled ? (pageProp as number) : uncontrolled;

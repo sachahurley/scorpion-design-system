@@ -42,7 +42,7 @@ import {
   type ReactNode,
 } from "react";
 import { FieldMessage, useFieldMessage } from "@/lib/field";
-import { resolveSize, type ControlSizeProp } from "@/lib/size";
+import type { ControlSize } from "@/lib/size";
 import { cn } from "@/lib/utils";
 import { useControllableState } from "@/lib/use-controllable-state";
 import { Popover } from "./Popover";
@@ -81,7 +81,7 @@ export interface ComboboxProps
   /** Message shown when nothing matches (default "No matches"). */
   emptyText?: ReactNode;
   /** Field height: sm 32px, md 40px (default), lg 48px. */
-  size?: ControlSizeProp;
+  size?: ControlSize;
   /** Visible label, wired to the input. Without it, pass `aria-label`. */
   label?: ReactNode;
   /** Hint under the field. Linked via `aria-describedby`. */
@@ -128,7 +128,7 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(function Com
     onInputChange,
     filter = defaultFilter,
     emptyText = "No matches",
-    size: sizeProp = "md",
+    size = "md",
     label,
     helperText,
     errorMessage,
@@ -149,7 +149,6 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(function Com
   },
   forwardedRef
 ) {
-  const size = resolveSize(sizeProp, "Combobox");
   const field = useFieldMessage({ error: errorProp, helperText, errorMessage, describedBy: ariaDescribedBy });
   const autoId = useId();
   const inputId = idProp ?? `${autoId}-input`;

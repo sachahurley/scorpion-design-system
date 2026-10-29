@@ -31,12 +31,12 @@
 
 import { forwardRef, useId, type ReactNode, type TextareaHTMLAttributes } from "react";
 import { FieldMessage, useFieldMessage } from "@/lib/field";
-import { resolveSize, type ControlSizeProp } from "@/lib/size";
+import type { ControlSize } from "@/lib/size";
 
 // Define the props interface for the Textarea component
 export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
-  /** Minimum height and padding: sm, md (default), lg, matching Input. Legacy names are deprecated aliases. */
-  size?: ControlSizeProp;
+  /** Minimum height and padding: sm, md (default), lg, matching Input. */
+  size?: ControlSize;
   /** Error styling without a message. Prefer `errorMessage` so users learn what to fix. */
   error?: boolean;
   /** Hint shown under the field (length, format). Linked via `aria-describedby`. */
@@ -66,7 +66,7 @@ export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElemen
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   (
     { 
-      size: sizeProp = "md", 
+      size = "md", 
       error: errorProp = false,
       helperText,
       errorMessage,
@@ -79,7 +79,6 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     },
     ref
   ) => {
-    const size = resolveSize(sizeProp, "Textarea");
     const field = useFieldMessage({ error: errorProp, helperText, errorMessage, describedBy: ariaDescribedBy });
     const error = field.invalid;
     const generatedId = useId();

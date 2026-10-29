@@ -10,7 +10,7 @@
  * - Customizable trigger (any React element)
  * - Icon support for menu items
  * - Destructive action styling
- * - Start or end alignment (`align`; `left` / `right` are deprecated aliases)
+ * - Start or end alignment (`align`)
  *
  * Every button here is `type="button"`, so a Dropdown inside a `<form>`
  * opens the menu instead of submitting the form.
@@ -18,8 +18,7 @@
 
 import { useState, useRef, useEffect, cloneElement, isValidElement, type MouseEvent as ReactMouseEvent, type ReactElement, type ReactNode } from "react";
 import { TuiIcon } from "./TuiIcon";
-import { resolveSize, type ControlSizeProp } from "@/lib/size";
-import { warnDeprecated } from "@/lib/deprecate";
+import type { ControlSize } from "@/lib/size";
 import { renderIconSlot, type IconSlot } from "@/lib/icon-slot";
 
 // Menu item interface
@@ -38,11 +37,6 @@ export interface DropdownItem {
   disabled?: boolean;
 }
 
-/** @deprecated Use `start` (for `left`) or `end` (for `right`). */
-type DeprecatedDropdownAlign = "left" | "right";
-
-const LEGACY_ALIGN: Record<DeprecatedDropdownAlign, "start" | "end"> = { left: "start", right: "end" };
-
 // Dropdown component props
 export interface DropdownProps {
   /**
@@ -59,13 +53,13 @@ export interface DropdownProps {
   /**
    * Which trigger edge the menu lines up with (default "start", the leading
    * edge). Use `end` for a trigger at the trailing edge of a row or header, so
-   * the menu opens inward. `left` and `right` are deprecated aliases.
+   * the menu opens inward.
    */
-  align?: "start" | "end" | DeprecatedDropdownAlign;
+  align?: "start" | "end";
   /** Text (and accessible name) of the default trigger button. Ignored with a custom `trigger`. */
   label?: string;
-  /** Trigger height, matching Button/Input: sm, md (default), lg. Legacy names are deprecated aliases. */
-  size?: ControlSizeProp;
+  /** Trigger height, matching Button/Input: sm, md (default), lg. */
+  size?: ControlSize;
 }
 
 /**
@@ -98,18 +92,10 @@ function nextEnabledIndex(items: DropdownItem[], from: number, delta: 1 | -1): n
 export function Dropdown({
   trigger,
   items,
-  align: alignProp = "start",
+  align = "start",
   label = "Actions",
-  size: sizeProp = "md"
+  size = "md"
 }: DropdownProps) {
-    const size = resolveSize(sizeProp, "Dropdown");
-  let align: "start" | "end";
-  if (alignProp === "left" || alignProp === "right") {
-    warnDeprecated("Dropdown", `align="${alignProp}"`, `align="${LEGACY_ALIGN[alignProp]}"`);
-    align = LEGACY_ALIGN[alignProp];
-  } else {
-    align = alignProp;
-  }
   const [isOpen, setIsOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const dropdownRef = useRef<HTMLDivElement>(null);

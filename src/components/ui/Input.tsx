@@ -28,13 +28,13 @@
 
 import { forwardRef, useId, type InputHTMLAttributes, type ReactNode } from "react";
 import { FieldMessage, useFieldMessage } from "@/lib/field";
-import { resolveSize, type ControlSizeProp } from "@/lib/size";
+import type { ControlSize } from "@/lib/size";
 
 // Define the props interface for the Input component
 // Omit the native HTML 'size' attribute to avoid conflict with our custom size prop
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
-  /** Field height: sm 32px, md 40px (default), lg 48px. Legacy small/medium/large are deprecated aliases. */
-  size?: ControlSizeProp;
+  /** Field height: sm 32px, md 40px (default), lg 48px. */
+  size?: ControlSize;
   /**
    * Visual variant. "box" (default) is the plate field; "quiet" is the
    * underline recipe — transparent, bottom hairline only, the site's voice
@@ -72,7 +72,7 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   (
     { 
-      size: sizeProp = "md", 
+      size = "md", 
       variant = "box",
       error: errorProp = false,
       helperText,
@@ -86,7 +86,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     },
     ref
   ) => {
-    const size = resolveSize(sizeProp, "Input");
     const field = useFieldMessage({ error: errorProp, helperText, errorMessage, describedBy: ariaDescribedBy });
     const error = field.invalid;
     const generatedId = useId();

@@ -31,7 +31,7 @@
 import { Children, Fragment, isValidElement, useState, useRef, useEffect, forwardRef, useImperativeHandle, useId, type ReactElement, type ReactNode, type SelectHTMLAttributes } from "react";
 import { FieldMessage, useFieldMessage } from "@/lib/field";
 import { TuiIcon } from "./TuiIcon";
-import { resolveSize, type ControlSizeProp } from "@/lib/size";
+import type { ControlSize } from "@/lib/size";
 
 /** One flattened option, plus the label of the `<optgroup>` it came from. */
 interface ParsedOption {
@@ -115,8 +115,8 @@ function nextEnabledIndex(options: ParsedOption[], from: number, delta: 1 | -1):
 
 // Define the props interface for the Select component
 export interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'size'> {
-  /** Trigger height: sm 32px, md 40px (default), lg 48px. Legacy names are deprecated aliases. */
-  size?: ControlSizeProp;
+  /** Trigger height: sm 32px, md 40px (default), lg 48px. */
+  size?: ControlSize;
   /** Error styling without a message. Prefer `errorMessage` so users learn what to fix. */
   error?: boolean;
   /** Hint shown under the trigger. Linked via `aria-describedby`. */
@@ -148,7 +148,7 @@ export interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement
  * @param errorMessage - Validation message under the trigger (implies `error`)
  */
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select({
-  size: sizeProp = "md",
+  size = "md",
   error: errorProp = false,
   helperText,
   errorMessage,
@@ -165,7 +165,6 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
   id: htmlId,
   ...props
 }, ref) {
-    const size = resolveSize(sizeProp, "Select");
   const field = useFieldMessage({ error: errorProp, helperText, errorMessage, describedBy: ariaDescribedBy });
   const error = field.invalid;
   const autoId = useId();

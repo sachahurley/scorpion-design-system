@@ -31,9 +31,9 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import { TuiIcon } from "./TuiIcon";
 import { useFocusTrap } from "@/lib/use-focus-trap";
 import { useControllableState } from "@/lib/use-controllable-state";
-import { warnDeprecated } from "@/lib/deprecate";
 
-interface BottomSheetBaseProps {
+/** Props for `BottomSheet`. An accessible name is required: pass `aria-label`. */
+export interface BottomSheetProps {
   /**
    * Whether the sheet is shown. Pass it with `onOpenChange` to control the
    * sheet: set it true to open, and false when `onOpenChange(false)` fires.
@@ -50,10 +50,6 @@ interface BottomSheetBaseProps {
    * click or Escape). Set `open` to false here when the sheet is controlled.
    */
   onOpenChange?: (open: boolean) => void;
-  /** @deprecated Use `open`. Still honoured when `open` is not passed. */
-  isOpen?: boolean;
-  /** @deprecated Use `onOpenChange`. Still called whenever `onOpenChange(false)` is. */
-  onClose?: () => void;
   /**
    * Accessible name for the close button. Override it when several sheets can
    * be announced in the same view and "Close" alone would be ambiguous.
@@ -61,29 +57,9 @@ interface BottomSheetBaseProps {
   closeLabel?: string;
   /** Sheet content. */
   children: ReactNode;
-}
-
-/** Names the sheet with `aria-label` (the current prop). */
-interface BottomSheetNamedProps extends BottomSheetBaseProps {
   /** Accessible name announced for the sheet dialog, e.g. "Site menu". Required. */
   "aria-label": string;
-  /** @deprecated Use `aria-label`. Ignored when `aria-label` is passed. */
-  ariaLabel?: string;
 }
-
-/** Names the sheet with the deprecated `ariaLabel`, so existing callers still type-check. */
-interface BottomSheetLegacyNamedProps extends BottomSheetBaseProps {
-  /** Accessible name announced for the sheet dialog, e.g. "Site menu". Required. */
-  "aria-label"?: string;
-  /** @deprecated Use `aria-label`. Ignored when `aria-label` is passed. */
-  ariaLabel: string;
-}
-
-/**
- * Props for `BottomSheet`. An accessible name is required: pass `aria-label`
- * (or, deprecated, `ariaLabel`).
- */
-export type BottomSheetProps = BottomSheetNamedProps | BottomSheetLegacyNamedProps;
 
 /**
  * A modal panel that slides up from the bottom edge, for short tasks and option lists on narrow screens.
@@ -97,31 +73,21 @@ export function BottomSheet({
   open: openProp,
   defaultOpen = false,
   onOpenChange,
-  isOpen: isOpenProp,
-  onClose,
-  "aria-label": ariaLabelProp,
-  ariaLabel: legacyAriaLabel,
+  "aria-label": ariaLabel,
   closeLabel = "Close",
   children,
 }: BottomSheetProps) {
-  if (isOpenProp !== undefined) warnDeprecated("BottomSheet", "isOpen", "open");
-  if (onClose !== undefined) warnDeprecated("BottomSheet", "onClose", "onOpenChange");
-  if (legacyAriaLabel !== undefined) warnDeprecated("BottomSheet", "ariaLabel", "aria-label");
-  const ariaLabel = ariaLabelProp ?? legacyAriaLabel;
-
-  // `open` wins over the deprecated `isOpen`; passing either makes the sheet controlled.
+  // Passing `open` makes the sheet controlled.
   const [isOpen, setOpenState] = useControllableState({
-    value: openProp ?? isOpenProp,
+    value: openProp,
     defaultValue: defaultOpen,
     onChange: onOpenChange,
   });
-  // Every dismissal path (close button, Escape, scrim) lands here, so the
-  // deprecated `onClose` fires exactly when `onOpenChange(false)` does.
+  // Every dismissal path (close button, Escape, scrim) lands here.
   const requestClose = useCallback(() => {
     if (!isOpen) return;
     setOpenState(false);
-    onClose?.();
-  }, [isOpen, setOpenState, onClose]);
+  }, [isOpen, setOpenState]);
 
   // Stay mounted while the exit animation plays; unmount on animationend so the
   // timing always matches the CSS duration token (no JS timer to drift).

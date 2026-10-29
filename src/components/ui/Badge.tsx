@@ -14,7 +14,6 @@
  * - bone: filled sepia-500 chip, identical in both themes — the
  *   tier-neutral state marker for surfaces that must not ride the accent
  *   or re-theme (the portfolio's equipped/loot chips)
- * The deprecated `variant` prop still works; its `default` maps to `neutral`.
  * 
  * SIZES:
  * - sm: Compact badge (20px height)
@@ -35,8 +34,7 @@
 
 import { type ReactNode } from "react";
 import { TuiIcon } from "./TuiIcon";
-import { resolveSize, type ControlSizeProp } from "@/lib/size";
-import { warnDeprecated } from "@/lib/deprecate";
+import type { ControlSize } from "@/lib/size";
 import { renderIconSlot, type IconSlot } from "@/lib/icon-slot";
 
 /**
@@ -48,13 +46,8 @@ export type BadgeTone = "neutral" | "info" | "success" | "warning" | "error" | "
 export interface BadgeProps {
   /** Colour role. Pair a semantic role with text that says the same thing, since colour alone is not enough; `bone` is a fixed tint that never follows the theme. Default: "neutral". */
   tone?: BadgeTone;
-  /**
-   * Colour role under its old name; `default` maps to `neutral`. When both are set, `tone` wins.
-   * @deprecated Use `tone`.
-   */
-  variant?: "default" | "primary" | "success" | "warning" | "error" | "info" | "bone";
-  /** Badge height: sm 20px, md 24px (default), lg 28px. Legacy names are deprecated aliases. */
-  size?: ControlSizeProp;
+  /** Badge height: sm 20px, md 24px (default), lg 28px. */
+  size?: ControlSize;
   /** Uppercase eyebrow voice: uppercase text with .08em tracking. */
   caps?: boolean;
   /**
@@ -71,22 +64,12 @@ export interface BadgeProps {
   /** Adds a remove (x) button that calls this when pressed. Use it for filter chips and tags the user can clear. */
   onDismiss?: () => void;
   /**
-   * Remove callback under its old name. When both are set, `onDismiss` wins.
-   * @deprecated Use `onDismiss`.
-   */
-  onClose?: () => void;
-  /**
    * Accessible name for the remove button. Defaults to `Remove {children}`
    * when the badge label is a plain string (so a list of filter chips reads as
    * "Remove Draft", "Remove Archived"), and to "Remove badge" otherwise. Pass
    * it explicitly whenever the label alone does not identify what is removed.
    */
   dismissLabel?: string;
-  /**
-   * Remove button name under its old name. When both are set, `dismissLabel` wins.
-   * @deprecated Use `dismissLabel`.
-   */
-  onCloseLabel?: string;
   /** Extra classes on the badge (margin, alignment). */
   className?: string;
 }
@@ -95,32 +78,21 @@ export interface BadgeProps {
  * A short status, category or count label set beside other content; with `onDismiss` it becomes a removable chip (a filter, a tag).
  */
 export function Badge({
-  tone: toneProp,
-  variant,
-  size: sizeProp = "md",
+  tone = "neutral",
+  size = "md",
   caps = false,
   dashed = false,
   children,
   iconLeft,
-  onDismiss: onDismissProp,
-  onClose,
+  onDismiss,
   dismissLabel,
-  onCloseLabel,
   className = "",
 }: BadgeProps) {
-  const size = resolveSize(sizeProp, "Badge");
-  // Deprecated aliases (decision 0024): the old names keep working, warn once,
-  // and lose to the new names when both are passed.
-  if (variant !== undefined) warnDeprecated("Badge", "variant", "tone");
-  if (onClose !== undefined) warnDeprecated("Badge", "onClose", "onDismiss");
-  if (onCloseLabel !== undefined) warnDeprecated("Badge", "onCloseLabel", "dismissLabel");
-  const tone: BadgeTone = toneProp ?? (variant === "default" ? "neutral" : variant) ?? "neutral";
-  const onDismiss = onDismissProp ?? onClose;
   // Name the remove button after the chip it removes when the label is plain
   // text; a caller can always override, and rich children fall back to the
   // generic name.
   const removeLabel =
-    dismissLabel ?? onCloseLabel ?? (typeof children === "string" ? `Remove ${children}` : "Remove badge");
+    dismissLabel ?? (typeof children === "string" ? `Remove ${children}` : "Remove badge");
   // SIZE STYLES - Heights and padding matching design system
   // Small: 20px height, 8px horizontal padding, 4px vertical padding
   // Medium: 24px height, 10px horizontal padding, 4px vertical padding

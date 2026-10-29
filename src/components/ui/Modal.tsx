@@ -97,10 +97,6 @@ export interface ModalProps {
    * a scrim click). Set `open` to false here when the dialog is controlled.
    */
   onOpenChange?: (open: boolean) => void;
-  /** @deprecated Use `open`. Still honoured when `open` is not passed. */
-  isOpen?: boolean;
-  /** @deprecated Use `onOpenChange`. Still called whenever `onOpenChange(false)` is. */
-  onClose?: () => void;
   /** Heading in the fixed header; also the dialog's accessible name, so make it say what the dialog is for. */
   title: string;
   /** Body content. It scrolls inside the panel when it is taller than the viewport allows; header and footer stay fixed. */
@@ -139,8 +135,6 @@ export function Modal({
   open: openProp,
   defaultOpen = false,
   onOpenChange,
-  isOpen: isOpenProp,
-  onClose,
   title,
   children,
   footerContent,
@@ -148,23 +142,19 @@ export function Modal({
   width,
   docked = false,
 }: ModalProps) {
-  if (isOpenProp !== undefined) warnDeprecated("Modal", "isOpen", "open");
-  if (onClose !== undefined) warnDeprecated("Modal", "onClose", "onOpenChange");
   if (width !== undefined) warnDeprecated("Modal", "width", "size");
 
-  // `open` wins over the deprecated `isOpen`; passing either makes the dialog controlled.
+  // Passing `open` makes the dialog controlled.
   const [isOpen, setOpenState] = useControllableState({
-    value: openProp ?? isOpenProp,
+    value: openProp,
     defaultValue: defaultOpen,
     onChange: onOpenChange,
   });
-  // Every dismissal path (close button, Escape, scrim) lands here, so the
-  // deprecated `onClose` fires exactly when `onOpenChange(false)` does.
+  // Every dismissal path (close button, Escape, scrim) lands here.
   const requestClose = useCallback(() => {
     if (!isOpen) return;
     setOpenState(false);
-    onClose?.();
-  }, [isOpen, setOpenState, onClose]);
+  }, [isOpen, setOpenState]);
 
   // `size` wins over the deprecated `width`; with neither, the panel is `lg`.
   const panelWidth =
