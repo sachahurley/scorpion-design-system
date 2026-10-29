@@ -79,11 +79,13 @@ git -C "$SCORP_DS_DIR" log --oneline -1 "$REF" > "$STAGE/vendor/VERSION"
 mkdir -p "$STAGE/ui"
 for c in "${COMPONENTS[@]}"; do
   # Adaptations: no Node types in the app tsconfig, and every internal lib
-  # helper (utils, field, size, ...) lives at @/lib/<name>
+  # helper (utils, field, size, ...) lives at @/lib/<name>, and primitives sit
+  # beside the components in src/components/ui, so ../primitives/X becomes ./X
   ds_file "packages/components/src/components/$c.tsx" | sed \
     -e 's/process\.env\.NODE_ENV === "production"/import.meta.env.PROD/g' \
     -e 's/NodeJS\.Timeout/ReturnType<typeof setTimeout>/g' \
     -e 's|from "\.\./lib/\([A-Za-z-]*\)"|from "@/lib/\1"|g' \
+    -e 's|from "\.\./primitives/\([A-Za-z]*\)"|from "./\1"|g' \
     > "$STAGE/ui/$c.tsx"
 done
 
@@ -102,6 +104,7 @@ for p in "${PRIMITIVES[@]}"; do
     -e 's/process\.env\.NODE_ENV === "production"/import.meta.env.PROD/g' \
     -e 's/NodeJS\.Timeout/ReturnType<typeof setTimeout>/g' \
     -e 's|from "\.\./lib/\([A-Za-z-]*\)"|from "@/lib/\1"|g' \
+    -e 's|from "\.\./components/\([A-Za-z]*\)"|from "./\1"|g' \
     > "$STAGE/ui/$p.tsx"
 done
 # Internal helpers (cn, field messages, size scale, positioning, hooks): all
