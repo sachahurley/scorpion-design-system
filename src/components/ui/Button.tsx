@@ -34,6 +34,9 @@
 
 import { forwardRef, useEffect, type ButtonHTMLAttributes, type CSSProperties, type MouseEvent } from "react";
 import { resolveSize, type ControlSizeProp } from "@/lib/size";
+
+/** @deprecated Icon-only buttons are squared automatically at every size: use `md`. */
+type DeprecatedButtonSize = "icon";
 import { Spinner } from "./Spinner";
 
 // Define the props interface for the Button component
@@ -49,11 +52,19 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
    * tokens. Legacy small/medium/large still work (deprecated). Icon-only buttons
    * are squared automatically. `"icon"` is deprecated: use "md".
    */
-  size?: ControlSizeProp | "icon";
+  size?: ControlSizeProp | DeprecatedButtonSize;
   /** Disables the button (anchors drop `href` and set `aria-disabled`). */
   disabled?: boolean;
-  // Icon support - can be any React element (TUI: typically TuiIcon or Unicode characters)
+  /**
+   * Icon before the label, usually a `TuiIcon`, to make the action quicker to
+   * recognise ("+ New"). For an icon-only button, pass the icon as `children`
+   * instead (the button squares itself) and give it an `aria-label`.
+   */
   iconLeft?: React.ReactNode;
+  /**
+   * Icon after the label, for direction or destination (an arrow on "Next", an
+   * external-link glyph on a link CTA).
+   */
   iconRight?: React.ReactNode;
   /**
    * Render as an `<a>` with this destination instead of a `<button>` — same
@@ -76,7 +87,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 /**
- * Button Component
+ * The control for triggering an action, or for navigating when given `href`; pick the `variant` by the action's weight on the page.
  * 
  * @param variant - Button style variant (default: "primary")
  * @param size - Button size (default: "md")

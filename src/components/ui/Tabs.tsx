@@ -44,7 +44,9 @@ export interface TabsProps {
   defaultValue?: string;
   /** Fires when the active tab changes. */
   onValueChange?: (value: string) => void;
+  /** One `TabsList` followed by a `TabsContent` for each trigger. */
   children: ReactNode;
+  /** Extra classes on the wrapper (width, spacing between the strip and panels). */
   className?: string;
 }
 
@@ -106,10 +108,13 @@ function triggerValuesFromListChildren(children: ReactNode): string[] {
 }
 
 export interface TabsListProps {
+  /** The `TabsTrigger` buttons, in the order the arrow keys move through them. */
   children: ReactNode;
+  /** Extra classes on the tab strip (alignment, overflow). */
   className?: string;
   /** Accessible name for the tab strip (pass this or `aria-labelledby`). */
   "aria-label"?: string;
+  /** Id of a visible heading that names the tab strip; use it instead of `aria-label` when such a heading exists. */
   "aria-labelledby"?: string;
 }
 
@@ -155,6 +160,7 @@ TabsList.displayName = "TabsList";
 export type TabsTriggerProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   /** Id matching a `TabsContent` `value`. */
   value: string;
+  /** The tab's label: a short noun for the panel it opens, optionally with an icon. */
   children: ReactNode;
 };
 
@@ -287,8 +293,11 @@ export const TabsTrigger = forwardRef<HTMLButtonElement, TabsTriggerProps>(funct
 TabsTrigger.displayName = "TabsTrigger";
 
 export interface TabsContentProps {
+  /** Id of this panel; the `TabsTrigger` with the same `value` opens it. */
   value: string;
+  /** The panel's content, shown while its tab is selected. */
   children: ReactNode;
+  /** Extra classes on the panel (padding, a min-height so the layout does not jump between tabs). */
   className?: string;
   /** Keep inactive panels mounted (hidden) so form state is preserved. */
   forceMount?: boolean;

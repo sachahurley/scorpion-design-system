@@ -71,10 +71,14 @@ function dockedMediaQuery(): string {
 
 // Define the props interface for the Modal component
 export interface ModalProps {
-  isOpen: boolean;                    // Controls whether modal is visible
-  onClose: () => void;                // Function to call when modal should close
-  title: string;                      // Title text displayed in fixed header
-  children: ReactNode;                // Content to display in scrollable area
+  /** Whether the dialog is shown. The parent owns this state: set it true to open, and false from `onClose`. */
+  isOpen: boolean;
+  /** Called when the user asks to close (close button, Escape, or a scrim click). Set `isOpen` to false here. */
+  onClose: () => void;
+  /** Heading in the fixed header; also the dialog's accessible name, so make it say what the dialog is for. */
+  title: string;
+  /** Body content. It scrolls inside the panel when it is taller than the viewport allows; header and footer stay fixed. */
+  children: ReactNode;
   /**
    * Optional fixed footer for CTAs. Render DS Buttons here (e.g. a secondary
    * "Cancel" + primary confirm); actions align to the right on a subtle band.
@@ -96,12 +100,7 @@ export interface ModalProps {
 }
 
 /**
- * Modal Component
- * 
- * @param isOpen - Whether the modal is currently visible
- * @param onClose - Callback function triggered when user closes modal
- * @param title - Header title text
- * @param children - Modal content (will be scrollable if it exceeds max-height)
+ * A dialog that interrupts the page for a focused task or a confirmation; it traps focus (except when `docked`) and closes on Escape, the scrim or the close button.
  */
 export function Modal({ isOpen, onClose, title, children, footerContent, width = 740, docked = false }: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
@@ -200,6 +199,7 @@ export function Modal({ isOpen, onClose, title, children, footerContent, width =
   // - Inner layer: card fill clipped 1px inset (p-px on the outer)
   // - Clicking inside the panel does NOT close it (stopPropagation)
   const panel = (
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- stops backdrop clicks inside the panel; Escape and the close button are the keyboard path
         <div
           ref={panelRef}
           tabIndex={-1}
@@ -236,6 +236,7 @@ export function Modal({ isOpen, onClose, title, children, footerContent, width =
               (target === the wrapper itself); clicks on the button bubble up with
               a different target and are ignored, so onClose fires exactly once.
             */}
+            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- enlarges the close button hit area for pointers; the button itself is the keyboard path */}
             <span
               className="relative ml-4 inline-flex shrink-0 before:content-[''] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-touch before:h-touch"
               onClick={(e) => {
@@ -262,6 +263,7 @@ export function Modal({ isOpen, onClose, title, children, footerContent, width =
             - overflow-y-auto adds scrollbar only when needed
           */}
           {/* tabIndex allows keyboard focus into the scroll region (axe scrollable-region-focusable / Safari). */}
+          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scrollable region must be keyboard-focusable (axe scrollable-region-focusable) */}
           <div className="overflow-y-auto px-6 py-5" tabIndex={0}>
             {children}
           </div>
@@ -316,6 +318,7 @@ export function Modal({ isOpen, onClose, title, children, footerContent, width =
         - Uses fade-in/fade-out animation
         - Uses z-index token for modal layer (1040) to ensure it covers sidebar
       */}
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- backdrop click to close; Escape and the close button are the keyboard path */}
       <div
         className={`fixed inset-0 flex items-center justify-center p-5 bg-[var(--surface-overlay)] ${
           closing ? "animate-out fade-out fill-mode-forwards" : "animate-in fade-in"

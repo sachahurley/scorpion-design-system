@@ -53,7 +53,7 @@ export interface RadioProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
 }
 
 /**
- * Radio Component
+ * One option in a group where exactly one can be chosen; radios with the same `name` form the group.
  * 
  * @param size - Radio size (default: "md")
  * @param label - Optional label text displayed next to radio
@@ -155,6 +155,7 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(
     // box. It sits inside the <label>, so a tap anywhere in it selects.
     const control = (
       <span className="relative inline-flex shrink-0 before:content-[''] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-touch before:h-touch">
+        {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props -- known gap: ARIA 1.2 puts aria-invalid on the radiogroup, see docs/specs/Radio.md */}
         <input
           ref={ref}
           type="radio"

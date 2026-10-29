@@ -39,7 +39,9 @@ import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { resolveSize, type ControlSize, type ControlSizeProp } from "@/lib/size";
 
 export interface SwitchProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onChange'> {
+  /** Whether the switch is on. The switch is controlled: keep this in state and update it from `onCheckedChange`. Default: false. */
   checked?: boolean;
+  /** Called with the next value when the user clicks the track or label, or presses Space or Enter. Without it the switch cannot change. */
   onCheckedChange?: (checked: boolean) => void;
   /** Track size. The tap target is at least 44px tall at every size. */
   size?: ControlSizeProp;
@@ -51,8 +53,10 @@ export interface SwitchProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
    * settings row — so the name isn't duplicated next to the track.
    */
   hideLabel?: boolean;
+  /** Blocks interaction and dims the switch. Prefer explaining nearby why a setting is unavailable. */
   disabled?: boolean;
-  icon?: ReactNode; // Optional icon to display inside the knob (e.g., Moon/Sun for theme toggle)
+  /** Icon drawn inside the knob, for a switch whose two states have a picture (a moon and sun for the theme toggle). */
+  icon?: ReactNode;
 }
 
 /**
@@ -91,15 +95,7 @@ const SWITCH_GEOMETRY: Record<ControlSize, {
 };
 
 /**
- * Switch Component
- *
- * @param checked - Whether switch is checked/on (default: false)
- * @param onCheckedChange - Callback when switch state changes
- * @param size - Switch size (default: "md")
- * @param label - Optional label text displayed next to switch (and the accessible name); clicking it toggles
- * @param hideLabel - Use label as the accessible name only; render no visible text
- * @param disabled - Whether switch is disabled
- * @param icon - Optional icon to display inside the knob (e.g., Moon/Sun for theme toggle)
+ * A toggle for a setting that takes effect at once, such as a preference; for a choice submitted with a form use `Checkbox`.
  */
 export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
   (
@@ -198,6 +194,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
             a <label> (a button is not a labelable element), so the click is
             wired by hand; the accessible name still comes from aria-label. */}
         {label && !hideLabel && (
+          // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- the visible label forwards pointer clicks to the switch button, which is the keyboard path
           <span
             onClick={handleClick}
             className={`select-none text-sm font-mono ${

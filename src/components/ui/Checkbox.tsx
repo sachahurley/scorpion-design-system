@@ -56,7 +56,7 @@ export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement
 }
 
 /**
- * Checkbox Component
+ * A labelled on/off choice that is submitted with a form, or one item in a multi-select list; also has a mixed (indeterminate) state.
  * 
  * @param size - Checkbox size (default: "md")
  * @param label - Optional label text displayed next to checkbox

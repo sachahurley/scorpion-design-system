@@ -55,7 +55,7 @@ const AVATAR = { sm: "size-control-sm", md: "size-control-md", lg: "size-control
 const STEPPED: CSSProperties = { animationTimingFunction: "steps(4, jump-none)" };
 
 /**
- * Skeleton Component
+ * A placeholder shape that holds the layout while content loads, drawn as text lines, a rectangle or an avatar.
  *
  * @example
  * <Skeleton lines={3} />

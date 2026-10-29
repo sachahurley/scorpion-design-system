@@ -195,6 +195,7 @@ export function Toast({ children, onClick, variant = "default", action, duration
   const persistent = duration === Infinity && onDismiss != null;
 
   return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events -- pointer shortcut to dismiss; the dismiss and action buttons are the keyboard path
     <div
       role={variant === "error" ? "alert" : "status"}
       onClick={onClick}

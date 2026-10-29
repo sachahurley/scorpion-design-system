@@ -131,7 +131,7 @@ export interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement
 }
 
 /**
- * Select Component
+ * A form control for choosing one value from a short, fixed list of options.
  * 
  * @param size - Select size matching input heights (default: "md")
  * @param error - Whether select has a validation error
@@ -406,6 +406,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
 
       {/* Custom trigger button — inset fill of the plate ring */}
       <div className={`plate-round p-px transition-colors [transition-duration:var(--duration-fast)] ${triggerRing} ${disabled ? 'opacity-50' : ''}`}>
+      {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props -- known gap: the trigger should be a select-only combobox, see docs/specs/Select.md */}
       <button
         type="button"
         id={triggerId}

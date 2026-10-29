@@ -19,6 +19,11 @@ export interface VisuallyHiddenProps extends Omit<HTMLAttributes<HTMLElement>, "
    * `li` inside a list rather than a generic `span`.
    */
   as?: VisuallyHiddenElement;
+  /**
+   * With `as="label"`, the `id` of the control this labels. The JSDoc below has
+   * always promised it; the type did not accept it until stories were type-checked.
+   */
+  htmlFor?: string;
   /** Extra classes (placement for the focusable variant), merged with `cn()` so they win. */
   className?: string;
 }

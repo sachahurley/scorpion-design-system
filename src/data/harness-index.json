@@ -17,10 +17,10 @@
     "specs": 61,
     "stories": 72,
     "baselines": 554,
-    "lintRules": 8,
+    "lintRules": 16,
     "skills": 19,
-    "decisions": 22,
-    "insights": 5,
+    "decisions": 27,
+    "insights": 6,
     "tokens": 423
   },
   "lintRules": [
@@ -28,7 +28,10 @@
       "name": "scorp/no-raw-color",
       "description": "No hex, rgb() or hsl() colors in component code. Use token-backed classes or var(--token).",
       "appliesTo": [
-        "packages/components/src/**/*.{ts,tsx}"
+        "packages/components/src/**/*.{ts,tsx}",
+        "packages/storybook/stories/**/*.{ts,tsx}",
+        "packages/storybook/presets/**/*.{ts,tsx}",
+        "packages/site/src/**/*.{ts,tsx}"
       ],
       "enabled": true
     },
@@ -36,7 +39,10 @@
       "name": "scorp/no-raw-scale",
       "description": "Use semantic aliases (primary-*, secondary-*) rather than raw color scales, so the system stays re-themeable.",
       "appliesTo": [
-        "packages/components/src/**/*.{ts,tsx}"
+        "packages/components/src/**/*.{ts,tsx}",
+        "packages/storybook/stories/**/*.{ts,tsx}",
+        "packages/storybook/presets/**/*.{ts,tsx}",
+        "packages/site/src/**/*.{ts,tsx}"
       ],
       "enabled": true
     },
@@ -46,7 +52,8 @@
       "appliesTo": [
         "packages/components/src/**/*.{ts,tsx}",
         "packages/storybook/stories/**/*.{ts,tsx}",
-        "packages/storybook/presets/**/*.{ts,tsx}"
+        "packages/storybook/presets/**/*.{ts,tsx}",
+        "packages/site/src/**/*.{ts,tsx}"
       ],
       "enabled": true
     },
@@ -56,13 +63,76 @@
       "appliesTo": [
         "packages/components/src/**/*.{ts,tsx}",
         "packages/storybook/stories/**/*.{ts,tsx}",
-        "packages/storybook/presets/**/*.{ts,tsx}"
+        "packages/storybook/presets/**/*.{ts,tsx}",
+        "packages/site/src/**/*.{ts,tsx}"
       ],
       "enabled": true
     },
     {
       "name": "scorp/no-arbitrary-values",
       "description": "No bare numeric literals in Tailwind arbitrary values. Route through a token, or allowlist with a reason.",
+      "appliesTo": [
+        "packages/components/src/**/*.{ts,tsx}",
+        "packages/storybook/stories/**/*.{ts,tsx}",
+        "packages/storybook/presets/**/*.{ts,tsx}",
+        "packages/site/src/**/*.{ts,tsx}"
+      ],
+      "enabled": true
+    },
+    {
+      "name": "scorp/no-undefined-css-var",
+      "description": "Every var(--name) must be a custom property that exists: declared in tokens.css (or one of the app stylesheets), or declared by the same file. Decision 0023.",
+      "appliesTo": [
+        "packages/components/src/**/*.{ts,tsx}",
+        "packages/storybook/stories/**/*.{ts,tsx}",
+        "packages/storybook/presets/**/*.{ts,tsx}",
+        "packages/storybook/.storybook/**/*.{ts,tsx}",
+        "packages/site/src/**/*.{ts,tsx}"
+      ],
+      "enabled": true
+    },
+    {
+      "name": "scorp/no-default-tailwind",
+      "description": "The preset extends Tailwind rather than replacing it, so Tailwind's own palette, shadows, radii, durations and fonts still compile. None of them are tokens.",
+      "appliesTo": [
+        "packages/components/src/**/*.{ts,tsx}",
+        "packages/storybook/stories/**/*.{ts,tsx}",
+        "packages/storybook/presets/**/*.{ts,tsx}",
+        "packages/site/src/**/*.{ts,tsx}"
+      ],
+      "enabled": true
+    },
+    {
+      "name": "scorp/no-slow-motion",
+      "description": "Interactive states animate in at most --duration-normal (200ms). --duration-slow and --duration-slower are for overlays entering or leaving, in allowlisted files. Decision 0025.",
+      "appliesTo": [
+        "packages/components/src/**/*.{ts,tsx}"
+      ],
+      "enabled": true
+    },
+    {
+      "name": "scorp/no-style-literals",
+      "description": "No raw sizes, colours, durations or fonts in inline style objects. Class rules cannot see style={{}}; values there go through var(--token) too.",
+      "appliesTo": [
+        "packages/components/src/**/*.{ts,tsx}"
+      ],
+      "enabled": true
+    },
+    {
+      "name": "scorp/no-deep-import",
+      "description": "Import other packages through their public barrel, never from their src/ internals.",
+      "appliesTo": [
+        "packages/components/src/**/*.{ts,tsx}",
+        "packages/storybook/stories/**/*.{ts,tsx}",
+        "packages/storybook/presets/**/*.{ts,tsx}",
+        "packages/storybook/.storybook/**/*.{ts,tsx}",
+        "packages/site/src/**/*.{ts,tsx}"
+      ],
+      "enabled": true
+    },
+    {
+      "name": "scorp/prop-jsdoc",
+      "description": "Every member of an exported *Props interface or type has a JSDoc comment. JSDoc on the prop is what autodocs, the IDE and api-surface.json read; @param on the function reaches none of them.",
       "appliesTo": [
         "packages/components/src/**/*.{ts,tsx}"
       ],
@@ -74,7 +144,25 @@
       "appliesTo": [
         "packages/components/src/**/*.{ts,tsx}",
         "packages/storybook/stories/**/*.{ts,tsx}",
-        "packages/storybook/presets/**/*.{ts,tsx}"
+        "packages/storybook/presets/**/*.{ts,tsx}",
+        "packages/storybook/.storybook/**/*.{ts,tsx}",
+        "packages/site/src/**/*.{ts,tsx}"
+      ],
+      "enabled": true
+    },
+    {
+      "name": "scorp/story-skip-visual-reason",
+      "description": "A `skip-visual` tag removes a story from visual regression, so it must say why in a comment (decision 0012). Usually a timer or randomness.",
+      "appliesTo": [
+        "packages/storybook/stories/**/*.stories.{ts,tsx}"
+      ],
+      "enabled": true
+    },
+    {
+      "name": "scorp/story-interaction-needs-play",
+      "description": "A story named for a state no prop can set (focus, hover, press, drag) must drive itself there with a play function, or visual regression captures the resting state (decision 0012).",
+      "appliesTo": [
+        "packages/storybook/stories/**/*.stories.{ts,tsx}"
       ],
       "enabled": true
     },
@@ -113,7 +201,8 @@
         "Type-check",
         "Unit tests",
         "API surface manifest is current",
-        "Specs match the components they describe"
+        "Specs match the components they describe",
+        "Component catalog is current"
       ],
       "url": "https://github.com/sachahurley/scorp-ds/blob/main/.github/workflows/ci.yml"
     },
@@ -325,9 +414,44 @@
       "title": "Text-field focus is a colour change, not an inset ring",
       "affects": "Input, Textarea",
       "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0022-field-focus-is-a-colour-change.md"
+    },
+    {
+      "id": "0023",
+      "title": "Semantic tokens are referenced by variable; every variable is checked",
+      "affects": "Components, stories, presets, the preset",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0023-semantic-tokens-are-referenced-by-variable.md"
+    },
+    {
+      "id": "0024",
+      "title": "One prop vocabulary, and one way to deprecate a name",
+      "affects": "Every component's public props",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0024-one-prop-vocabulary.md"
+    },
+    {
+      "id": "0025",
+      "title": "The 200ms cap is for interactive states; overlays may take longer",
+      "affects": "Transitions, global.duration",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0025-motion-cap-is-for-interactive-states.md"
+    },
+    {
+      "id": "0026",
+      "title": "A spec is stable when it meets a checkable bar",
+      "affects": "docs/specs/, the catalog",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0026-a-spec-is-stable-when-it-meets-the-bar.md"
+    },
+    {
+      "id": "0027",
+      "title": "Half-step spacing gets tokens; off-scale steps are errors",
+      "affects": "global.spacing, the preset",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0027-half-step-spacing-is-tokenised.md"
     }
   ],
   "insights": [
+    {
+      "date": "2026-10-28",
+      "title": "Strong components, but the step from component to screen still needs a human",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/insights/2026-10-28-agent-readiness-audit.md"
+    },
     {
       "date": "2026-10-27",
       "title": "The checks were good; nothing made them block",

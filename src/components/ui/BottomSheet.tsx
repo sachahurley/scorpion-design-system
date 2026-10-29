@@ -48,7 +48,7 @@ export interface BottomSheetProps {
 }
 
 /**
- * BottomSheet Component
+ * A modal panel that slides up from the bottom edge, for short tasks and option lists on narrow screens.
  *
  * @param isOpen - Whether the sheet is currently visible
  * @param onClose - Callback when the user dismisses (close button, scrim click or ESC)
@@ -156,6 +156,7 @@ export function BottomSheet({ isOpen, onClose, ariaLabel, closeLabel = "Close", 
             </button>
           </div>
           {/* Scrollable content region (focusable for keyboard scrolling) */}
+          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scrollable region must be keyboard-focusable (axe scrollable-region-focusable) */}
           <div className="w-full overflow-y-auto" tabIndex={0}>
             {children}
           </div>

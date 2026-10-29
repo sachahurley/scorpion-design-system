@@ -59,7 +59,7 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
 }
 
 /**
- * Input Component
+ * A single-line text field, with an optional label, helper text and error message wired up for assistive tech.
  * 
  * @param size - Input size matching button heights (default: "md")
  * @param error - Whether input has a validation error

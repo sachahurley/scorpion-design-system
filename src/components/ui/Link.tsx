@@ -56,20 +56,26 @@ type CommonProps = {
 
 export type LinkProps = CommonProps &
   (
-    | ({ href: string; as?: never; asProps?: never } & Omit<
-        AnchorHTMLAttributes<HTMLAnchorElement>,
-        "href" | "className"
-      >)
-    /**
-     * Custom link component (e.g. a router <Link>): rendered with identical
-     * styling and `asProps` spread onto it (`to`, `state`, ...), so
-     * client-side navigation works without a full page load.
-     */
-    | { as: ElementType; asProps?: Record<string, unknown>; href?: never }
+    | ({
+        /** Destination URL. Renders a plain `<a href>`; use `as` instead for a router link. */
+        href: string;
+        as?: never;
+        asProps?: never;
+      } & Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href" | "className">)
+    | {
+        /**
+         * Custom link component (e.g. a router `<Link>`), rendered with identical
+         * styling so client-side navigation works without a full page load.
+         */
+        as: ElementType;
+        /** Props for the `as` component (`to`, `state`, ...), spread onto it as-is. */
+        asProps?: Record<string, unknown>;
+        href?: never;
+      }
   );
 
 /**
- * Link Component
+ * Text navigation, inline in prose or quiet in chrome; external links open a new tab and say so.
  *
  * Renders an `<a href>` by default, or a custom component via `as`/`asProps`
  * (mirrors the `ListRow` polymorphism, so router links work the same way in
