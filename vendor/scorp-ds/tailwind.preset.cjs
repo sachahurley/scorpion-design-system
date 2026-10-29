@@ -275,6 +275,29 @@ module.exports = {
       // w-touch / h-touch for 44px hit areas (Tailwind 3.4 feeds spacing to
       // width, height, min/max sizes and size-*)
       spacing: {
+        // The spacing scale (global.spacing), whole and half steps, routed through
+        // the variables so a token edit reaches every p-*, m-*, gap-* class. Values
+        // equal Tailwind's defaults, so nothing moves. Half steps are hyphenated in
+        // the token name (DTCG names cannot hold a dot): `1.5` is --spacing-1-5.
+        // Steps outside this list (7, 9, 11, 14, …) are lint errors in components
+        // (scorp/no-off-scale-spacing, decision 0027).
+        0: 'var(--spacing-0)',
+        0.5: 'var(--spacing-0-5)',
+        1: 'var(--spacing-1)',
+        1.5: 'var(--spacing-1-5)',
+        2: 'var(--spacing-2)',
+        2.5: 'var(--spacing-2-5)',
+        3: 'var(--spacing-3)',
+        3.5: 'var(--spacing-3-5)',
+        4: 'var(--spacing-4)',
+        5: 'var(--spacing-5)',
+        6: 'var(--spacing-6)',
+        8: 'var(--spacing-8)',
+        10: 'var(--spacing-10)',
+        12: 'var(--spacing-12)',
+        16: 'var(--spacing-16)',
+        20: 'var(--spacing-20)',
+        24: 'var(--spacing-24)',
         'control-sm': 'var(--control-height-sm)',
         'control-md': 'var(--control-height-md)',
         'control-lg': 'var(--control-height-lg)',
