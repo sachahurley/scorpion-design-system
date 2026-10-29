@@ -125,6 +125,7 @@ export function LogView({
         role="log"
         aria-live="polite"
         aria-label={ariaLabel}
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a scrollable log must be keyboard-focusable (axe scrollable-region-focusable)
         tabIndex={0}
         onScroll={handleScroll}
         className={cn(

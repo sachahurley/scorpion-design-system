@@ -190,6 +190,7 @@ export function Accordion(props: AccordionProps) {
 
   return (
     <AccordionContext.Provider value={ctx}>
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions -- delegated arrow-key navigation between the item triggers, which are real buttons */}
       <div
         ref={rootRef}
         data-accordion-root=""

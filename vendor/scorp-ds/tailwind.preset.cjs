@@ -1,11 +1,11 @@
 /**
- * SCORPION UI - TAILWIND PRESET
+ * SCORP DS - TAILWIND PRESET
  * 
  * This preset extends Tailwind CSS with Scorp DS design tokens.
  * Use this in your consuming project's tailwind.config.js:
  * 
  * module.exports = {
- *   presets: [require('scorp-ds/tailwind.preset.js')],
+ *   presets: [require('@scorp-ds/tokens/tailwind.preset')],
  *   // ... your other config
  * }
  */

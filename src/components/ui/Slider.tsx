@@ -50,7 +50,7 @@ function fillPercent(value: number, min: number, max: number): number {
 }
 
 /**
- * Slider Component
+ * A range input for choosing a number between `min` and `max` by dragging or with the arrow keys.
  *
  * @param label - Optional visible label wired to the input with matching id
  * All other props (min, max, step, value, onChange, disabled, ...) pass

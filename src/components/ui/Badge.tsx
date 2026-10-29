@@ -37,6 +37,7 @@ import { TuiIcon } from "./TuiIcon";
 import { resolveSize, type ControlSizeProp } from "@/lib/size";
 
 export interface BadgeProps {
+  /** Colour role. Pair a semantic role with text that says the same thing, since colour alone is not enough; `bone` is a fixed tint that never follows the theme. Default: "default". */
   variant?: "default" | "primary" | "success" | "warning" | "error" | "info" | "bone";
   /** Badge height: sm 20px, md 24px (default), lg 28px. Legacy names are deprecated aliases. */
   size?: ControlSizeProp;
@@ -49,8 +50,11 @@ export interface BadgeProps {
    * would slice the dashes).
    */
   dashed?: boolean;
+  /** The label: a word, a short phrase or a number. Keep it to one line. */
   children: ReactNode;
+  /** Icon before the label, usually a `TuiIcon`, to reinforce the meaning of a status badge. */
   iconLeft?: ReactNode;
+  /** Adds a remove (x) button that calls this when pressed. Use it for filter chips and tags the user can clear. */
   onClose?: () => void;
   /**
    * Accessible name for the remove button. Defaults to `Remove {children}`
@@ -59,19 +63,12 @@ export interface BadgeProps {
    * it explicitly whenever the label alone does not identify what is removed.
    */
   onCloseLabel?: string;
+  /** Extra classes on the badge (margin, alignment). */
   className?: string;
 }
 
 /**
- * Badge Component
- * 
- * @param variant - Badge color variant (default: "default")
- * @param size - Badge size (default: "md")
- * @param children - Badge content (text, numbers, etc.)
- * @param iconLeft - Optional icon to display on the left
- * @param onClose - Optional callback when close button is clicked
- * @param onCloseLabel - Accessible name for the remove button (defaults to `Remove {children}`)
- * @param className - Additional CSS classes
+ * A short status, category or count label set beside other content; with `onClose` it becomes a removable chip (a filter, a tag).
  */
 export function Badge({
   variant = "default",

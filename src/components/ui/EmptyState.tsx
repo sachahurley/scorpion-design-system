@@ -63,7 +63,7 @@ const SIZES = {
 };
 
 /**
- * EmptyState Component
+ * Explains why a view has nothing to show and offers the next step, inline (`sm`) or filling a page (`md`).
  *
  * @example
  * <EmptyState

@@ -1,5 +1,5 @@
 /**
- * SCORPION UI - DESIGN TOKENS AS CSS VARIABLES
+ * SCORP DS - DESIGN TOKENS AS CSS VARIABLES
  * 
  * These CSS custom properties power the entire design system.
  * They switch automatically based on the light/dark theme.
@@ -7,8 +7,10 @@
  * TUI Tier 1: Sharp corners (0px radius), no shadows, full monospace, snappy animations
  * TUI Tier 2: ANSI terminal accent colors, amber CRT tint in dark mode
  * 
- * Usage in CSS: background-color: var(--color-amber-500);
- * Usage in Tailwind: Already configured! Just use: bg-amber-500
+ * Usage in CSS: background-color: var(--surface-raised);
+ * Usage in Tailwind (with @scorp-ds/tokens/tailwind.preset): semantic tokens
+ * by variable, bg-[var(--surface-raised)]; colour scales through the semantic
+ * alias, bg-primary-500, never the raw scale name (docs/decisions/0006, 0023).
  */
 
 /* Scorp Symbols: glyphs browsers never receive from Fragment Mono (it lacks

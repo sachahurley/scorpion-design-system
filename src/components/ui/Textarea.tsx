@@ -53,7 +53,7 @@ export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElemen
 }
 
 /**
- * Textarea Component
+ * A multi-line text field for free-form input, with an optional label, helper text and error message.
  * 
  * @param size - Textarea size matching input heights (default: "md")
  * @param error - Whether textarea has a validation error

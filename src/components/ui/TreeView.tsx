@@ -291,6 +291,7 @@ export function TreeView({
           }}
           className="focus:outline-none [&:focus-visible>div]:[box-shadow:inset_0_0_0_var(--focus-ring-width)_var(--focus-ring-primary)]"
         >
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- pointer path for the row; the treeitem handles the keyboard with roving tabindex */}
           <div
             style={{ ["--tree-level" as string]: level - 1 }}
             onClick={(e) => {

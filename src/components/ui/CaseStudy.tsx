@@ -53,53 +53,76 @@ export type CaseStudySlots = Record<string, ReactNode>;
 
 /** A title + blurb pair, shared by list, insights and callouts. */
 export interface CaseStudyItem {
+  /** Short heading for the item: a step name, a finding, a pillar. */
   title: string;
+  /** One or two sentences under the title explaining it. */
   text: string;
 }
 
 /** One big result figure: `{ value: "43", label: "components" }`. */
 export interface CaseStudyOutcome {
+  /** The figure itself, set large in the accent colour ("43", "2x", "-60%"). Keep it short. */
   value: string;
+  /** What the figure counts, in a few words ("components shipped"). */
   label: string;
 }
 
 /** A single picture: real art via `src`, the hatch placeholder without. */
 export interface CaseStudyFigure {
+  /** Image URL. Omit it to render the hatch placeholder, so a page can be laid out before its art exists. */
   src?: string;
   /** Empty string (the default) marks the image decorative. */
   alt?: string;
   /** CSS aspect-ratio, e.g. "21 / 9". Defaults to "16 / 9". */
   aspect?: string;
+  /** Text under the figure; inside a section it is prefixed with the figure number. */
   caption?: string;
+  /** Break out of the text column: `wide` or `full` bleed. Omit it to keep the figure in the column. */
   width?: "wide" | "full";
 }
 
 /** What a section can contain. Headings are not blocks: sections own them. */
 export type CaseStudyContentBlock =
-  | { type: "prose"; text: string }
+  | {
+      type: "prose";
+      /** A paragraph of body copy. */
+      text: string;
+    }
   | ({ type: "image" } & CaseStudyFigure)
   | {
       type: "imagePair";
+      /** One caption per image, left then right; each gets its own figure number. */
       captions?: [string, string];
+      /** Break the pair out of the text column, as on `CaseStudyFigure`. */
       width?: "wide" | "full";
+      /** Image URLs, left then right; an `undefined` entry renders the hatch placeholder. */
       srcs?: [string | undefined, string | undefined];
+      /** Alt text for each image, left then right; omit for decorative images. */
       alts?: [string | undefined, string | undefined];
     }
   | {
       /** A box-drawing diagram kept as live text (generate with
        *  @scorp-ds/tui-art). `label` says what it shows, for screen readers. */
       type: "ascii";
+      /** The diagram, line breaks included, rendered in monospace exactly as written. */
       text: string;
+      /** Numbered caption under the diagram. */
       caption?: string;
+      /** Break the diagram out of the text column. */
       width?: "wide" | "full";
+      /** Accessible description of what the diagram shows; falls back to the caption. */
       label?: string;
     }
   | {
       /** A live region filled through the `slots` prop, keyed by `name`. */
       type: "slot";
+      /** Key into the `slots` prop; a name with no entry renders the hatch placeholder. */
       name: string;
+      /** Numbered caption under the slot. */
       caption?: string;
+      /** Break the slot out of the text column. */
       width?: "wide" | "full";
+      /** CSS aspect-ratio for the placeholder, e.g. "4 / 3". */
       aspect?: string;
     }
   /** Steps, flows or principles: a connected tree, title over text. */
@@ -109,9 +132,25 @@ export type CaseStudyContentBlock =
   /** Pillars or options: cards, two up, or three up (wide) for three. */
   | { type: "callouts"; items: CaseStudyItem[] }
   /** A testimonial: hangs off an accent rule, optional attribution. */
-  | { type: "quote"; text: string; name?: string; role?: string; image?: string }
+  | {
+      type: "quote";
+      /** The quotation, without quote marks. */
+      text: string;
+      /** Who said it. */
+      name?: string;
+      /** Their role or company, shown under the name. */
+      role?: string;
+      /** Portrait URL for the small avatar beside the attribution (the attribution only renders with `name`). */
+      image?: string;
+    }
   /** The thesis or challenge, set large between rules. */
-  | { type: "statement"; text: string; kicker?: string }
+  | {
+      type: "statement";
+      /** The thesis or challenge in one or two sentences. */
+      text: string;
+      /** Small accent label above the statement ("the challenge"). */
+      kicker?: string;
+    }
   /** Results as big accent figures. */
   | { type: "outcomes"; items: CaseStudyOutcome[] };
 
@@ -119,9 +158,11 @@ export type CaseStudyContentBlock =
 export interface CaseStudySection {
   /** Short section name shown in the rule: "the problem". */
   kicker: string;
+  /** The section's heading, a sentence that states its point. */
   title: string;
   /** Optional lead paragraph under the title. */
   intro?: string;
+  /** Content in reading order. Figures inside are numbered across the whole page. */
   blocks?: CaseStudyContentBlock[];
   /** Leave the section out of the page (and out of the numbering). */
   hidden?: boolean;
@@ -131,12 +172,17 @@ export interface CaseStudySection {
 
 /** The whole page. `title` and `summary` are the fields every study needs. */
 export interface CaseStudy {
+  /** The page title, the largest type on the page. */
   title: string;
   /** One line: what this was and what it achieved. */
   summary: string;
+  /** Headline results, shown as accent figures in the header. */
   outcomes?: CaseStudyOutcome[];
+  /** Label and value rows in the header: role, team, timeline, year. */
   meta?: { label: string; value: string }[];
+  /** Cover image under the header. */
   cover?: CaseStudyFigure;
+  /** The body, in reading order; reorder by moving entries and hide one with `hidden`. */
   sections: CaseStudySection[];
 }
 
@@ -565,7 +611,7 @@ export function CaseStudySections({
 }
 
 /**
- * CaseStudyPage Component
+ * The page template for a portfolio case study, rendered from one `CaseStudy` data object.
  *
  * Renders a whole case study: the header, then each visible section with a
  * numbered header and its content blocks.

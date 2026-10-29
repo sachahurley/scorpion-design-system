@@ -26,28 +26,26 @@ import { useState, type ReactNode } from "react";
 import { resolveSize, type ControlSizeProp } from "@/lib/size";
 
 export interface AvatarProps {
+  /** Image URL. Shown when set and it loads; otherwise the avatar falls back to `initials`, then `icon`, then an `@` glyph. */
   src?: string;
+  /** Alt text for the image, usually the person's name. Defaults to "Avatar", so pass it whenever `src` is set. */
   alt?: string;
+  /** One or two letters shown when there is no image, or the image fails to load. */
   initials?: string;
+  /** Icon shown when there is neither an image nor initials (for a team, a bot, a system account). */
   icon?: ReactNode;
   /** Diameter: sm 24px, md 40px (default), lg 64px, xl 96px. Legacy names are deprecated aliases. */
   size?: ControlSizeProp | "xl";
+  /** Presence dot in the corner, announced as "Status: online" and so on. Omit it to show no dot. */
   status?: "online" | "offline" | "away";
+  /** Extra classes on the outer wrapper (margin, positioning). */
   className?: string;
+  /** Called when `src` fails to load (to log it, or swap the URL); the avatar shows its fallback either way. */
   onError?: () => void;
 }
 
 /**
- * Avatar Component
- * 
- * @param src - Image source URL (if using image variant)
- * @param alt - Alt text for image (accessibility)
- * @param initials - User initials (if using initials variant)
- * @param icon - Custom icon element (if using icon variant)
- * @param size - Avatar size (default: "md")
- * @param status - Status indicator (online/offline/away)
- * @param className - Additional CSS classes
- * @param onError - Callback when image fails to load
+ * Shows a person or entity as an image, initials or an icon, with an optional presence dot; an image that fails to load falls back to `initials`, then `icon`.
  */
 export function Avatar({
   src,

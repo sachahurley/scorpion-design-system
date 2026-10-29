@@ -103,7 +103,7 @@ export interface TooltipProps {
 }
 
 /**
- * Tooltip Component
+ * A short text hint shown while its trigger is hovered or focused; for interactive content use `Popover`.
  * 
  * @param content - Tooltip text/content to display
  * @param children - Trigger element (wrapped with tooltip)

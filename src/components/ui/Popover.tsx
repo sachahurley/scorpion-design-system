@@ -126,7 +126,7 @@ const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 /**
- * Popover Component
+ * A non-modal panel anchored to a trigger, for interactive content (filters, a short form) that a `Tooltip` cannot hold.
  *
  * @example
  * <Popover trigger={<Button variant="secondary">Filters</Button>} aria-label="Filters">

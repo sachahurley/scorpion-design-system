@@ -43,7 +43,7 @@ export interface AlertProps {
 }
 
 /**
- * Alert Component
+ * An inline message about the state of a page or form that stays until the user acts, with an optional title, icon and dismiss button.
  * 
  * @param variant - Alert color variant (default: "default")
  * @param title - Optional alert title

@@ -105,7 +105,7 @@ const defaultFilter = (option: ComboboxOption, query: string) =>
   option.label.toLowerCase().includes(query.trim().toLowerCase());
 
 /**
- * Combobox Component
+ * A text input that filters a list of options as the user types, for choosing one value from a list too long to scan.
  *
  * @example
  * <Combobox
@@ -426,6 +426,7 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(function Com
               const isSelected = option.value === value;
               const isActive = index === activeIndex;
               return (
+                // eslint-disable-next-line jsx-a11y/click-events-have-key-events -- pointer path only; the keyboard selects through the input with aria-activedescendant
                 <li
                   key={option.value}
                   id={optionId(index)}
