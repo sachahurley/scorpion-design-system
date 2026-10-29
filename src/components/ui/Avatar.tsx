@@ -24,7 +24,7 @@
  */
 
 import { useState, type ReactNode } from "react";
-import { resolveSize, type ControlSizeProp } from "@/lib/size";
+import type { ControlSize } from "@/lib/size";
 import { renderIconSlot, type IconSlot } from "@/lib/icon-slot";
 
 export interface AvatarProps {
@@ -42,8 +42,8 @@ export interface AvatarProps {
   initials?: string;
   /** Icon shown when there is neither an image nor initials (for a team, a bot, a system account). Takes a TuiIcon name (`"Check"`) or an element. */
   icon?: IconSlot | ReactNode;
-  /** Diameter: sm 24px, md 40px (default), lg 64px, xl 96px. Legacy names are deprecated aliases. */
-  size?: ControlSizeProp | "xl";
+  /** Diameter: sm 24px, md 40px (default), lg 64px, xl 96px. */
+  size?: ControlSize | "xl";
   /** Presence dot in the corner, announced as "Status: online" and so on. Omit it to show no dot. */
   status?: "online" | "offline" | "away";
   /** Extra classes on the outer wrapper (margin, positioning). */
@@ -60,12 +60,11 @@ export function Avatar({
   alt,
   initials,
   icon,
-  size: sizeProp = "md",
+  size = "md",
   status,
   className = "",
   onError,
 }: AvatarProps) {
-    const size = resolveSize(sizeProp, "Avatar", "md" as "sm" | "md" | "lg" | "xl");
   const [imageError, setImageError] = useState(false);
 
   // SIZE STYLES - Square avatars matching design system

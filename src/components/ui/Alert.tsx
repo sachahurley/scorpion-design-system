@@ -10,7 +10,6 @@
  * - warning: Purple for warnings
  * - error: Red for error messages
  * - info: Blue for informational messages
- * The deprecated `variant` prop still works; its `default` maps to `neutral`.
  * 
  * FEATURES:
  * - Severity icon per tone from the 1-bit set: neutral Bell, info Info,
@@ -26,7 +25,6 @@
  */
 
 import { type ReactNode } from "react";
-import { warnDeprecated } from "@/lib/deprecate";
 import { TuiIcon, type TuiIconName } from "./TuiIcon";
 import { renderIconSlot, type IconSlot } from "@/lib/icon-slot";
 
@@ -36,11 +34,6 @@ export type AlertTone = "neutral" | "info" | "success" | "warning" | "error";
 export interface AlertProps {
   /** Severity: picks the colour set and the 1-bit severity icon. Default: "neutral". */
   tone?: AlertTone;
-  /**
-   * Severity under its old name; `default` maps to `neutral`. When both are set, `tone` wins.
-   * @deprecated Use `tone`.
-   */
-  variant?: "default" | "success" | "warning" | "error" | "info";
   /** Short bold headline, one line. Say what happened, not "Error". */
   title?: string;
   /** Body copy under the title: what it means and what to do next. */
@@ -49,11 +42,6 @@ export interface AlertProps {
   iconLeft?: IconSlot | ReactNode;
   /** Adds a dismiss control (44px hit area) and is called when it is pressed. */
   onDismiss?: () => void;
-  /**
-   * Dismiss callback under its old name. When both are set, `onDismiss` wins.
-   * @deprecated Use `onDismiss`.
-   */
-  onClose?: () => void;
   /**
    * Accessible name of the dismiss button (default "Close alert"). Name what it
    * dismisses when a page has several alerts ("Dismiss sync warning").
@@ -74,23 +62,14 @@ export interface AlertProps {
  * @param className - Additional CSS classes
  */
 export function Alert({
-  tone: toneProp,
-  variant,
+  tone = "neutral",
   title,
   description,
   iconLeft,
-  onDismiss: onDismissProp,
-  onClose,
+  onDismiss,
   dismissLabel = "Close alert",
   className = "",
 }: AlertProps) {
-  // Deprecated aliases (decision 0024): the old names keep working, warn once,
-  // and lose to the new names when both are passed.
-  if (variant !== undefined) warnDeprecated("Alert", "variant", "tone");
-  if (onClose !== undefined) warnDeprecated("Alert", "onClose", "onDismiss");
-  const tone: AlertTone = toneProp ?? (variant === "default" ? "neutral" : variant) ?? "neutral";
-  const onDismiss = onDismissProp ?? onClose;
-
   // 1-bit severity icons, one per tone (neutral and info differ, so the
   // icon, not just the color, tells them apart)
   const severityIcons: Record<AlertTone, TuiIconName> = {

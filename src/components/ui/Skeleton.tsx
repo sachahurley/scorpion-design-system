@@ -32,7 +32,7 @@
  */
 
 import type { CSSProperties } from "react";
-import { resolveSize, type ControlSizeProp } from "@/lib/size";
+import type { ControlSize } from "@/lib/size";
 import { cn } from "@/lib/utils";
 
 export interface SkeletonProps {
@@ -43,9 +43,9 @@ export interface SkeletonProps {
   /**
    * Avatar square size: sm 32px, md 40px (default), lg 48px (control heights).
    * Only the `avatar` variant reads it: `text` and `rect` ignore it, so size those
-   * with `lines` and `className`. Legacy small/medium/large are deprecated aliases.
+   * with `lines` and `className`.
    */
-  size?: ControlSizeProp;
+  size?: ControlSize;
   /**
    * Whether the stepped pulse runs. Defaults to `true`; pass `false` to hold the
    * placeholder still (e.g. many skeletons on one screen). Reduced motion always
@@ -75,8 +75,7 @@ const STEPPED: CSSProperties = { animationTimingFunction: "steps(4, jump-none)" 
  * @param size - Avatar size (sm, md, lg); ignored by text and rect
  * @param animated - Stepped pulse on (default true) or off
  */
-export function Skeleton({ variant = "text", lines = 1, size: sizeProp = "md", animated = true, className }: SkeletonProps) {
-  const size = resolveSize(sizeProp, "Skeleton");
+export function Skeleton({ variant = "text", lines = 1, size = "md", animated = true, className }: SkeletonProps) {
   const pulse = animated ? "animate-pulse motion-reduce:animate-none" : "";
   const style = animated ? STEPPED : undefined;
 

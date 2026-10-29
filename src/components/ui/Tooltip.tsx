@@ -48,7 +48,6 @@ import {
   type ReactElement,
   type ReactNode,
 } from "react";
-import { warnDeprecated } from "@/lib/deprecate";
 
 type Side = "top" | "bottom" | "left" | "right";
 type Align = "start" | "center" | "end";
@@ -116,8 +115,6 @@ export interface TooltipProps {
    * trigger at the edge of a row; the caret still points at the trigger.
    */
   align?: "start" | "center" | "end";
-  /** @deprecated Use `side`. Still honoured when `side` is not passed. */
-  position?: "top" | "bottom" | "left" | "right";
   /** Delay in milliseconds before showing on hover or focus (default 200). Hiding is immediate. */
   delay?: number;
   /**
@@ -142,16 +139,12 @@ export interface TooltipProps {
 export function Tooltip({
   content,
   children,
-  side: sideProp,
+  side: position = "top",
   align = "center",
-  position: legacyPosition,
   delay = 200,
   maxWidth = "200px",
   className = "",
 }: TooltipProps) {
-  if (legacyPosition !== undefined) warnDeprecated("Tooltip", "position", "side");
-  // `side` wins over the deprecated `position`
-  const position: Side = sideProp ?? legacyPosition ?? "top";
   const [isVisible, setIsVisible] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);

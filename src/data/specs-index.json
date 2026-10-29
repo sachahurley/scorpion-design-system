@@ -26,7 +26,7 @@
           "category": "Feedback",
           "status": "draft",
           "story": "Components/Feedback/Alert",
-          "updated": "2026-10-28",
+          "updated": "2026-10-29",
           "component": "Alert (import from @scorp-ds/components)",
           "summary": "Alert is an inline, persistent message that sits in the page flow next to the content it describes: a failed save above a form, a warning at the top of a settings panel, a neutral notice about a changed default."
         },
@@ -62,7 +62,7 @@
           "category": "Feedback",
           "status": "draft",
           "story": "Components/Feedback/Badge",
-          "updated": "2026-10-28",
+          "updated": "2026-10-29",
           "component": "Badge (import from @scorp-ds/components)",
           "summary": "Badge is a compact inline chip for labelling, categorising, or flagging state: a status next to a row, a count, a filter tag, a tier marker."
         },
@@ -74,7 +74,7 @@
           "category": "Overlays",
           "status": "draft",
           "story": "Components/Overlays/BottomSheet",
-          "updated": "2026-10-28",
+          "updated": "2026-10-29",
           "component": "BottomSheet (import from @scorp-ds/components)",
           "summary": "BottomSheet is a panel that slides up from the bottom edge over a scrim, for menus and quick actions that dismiss easily: a site menu on mobile, a short list of options, a share sheet."
         },
@@ -110,7 +110,7 @@
           "category": "Actions",
           "status": "draft",
           "story": "Components/Actions/Button",
-          "updated": "2026-10-28",
+          "updated": "2026-10-29",
           "component": "Button (import from @scorp-ds/components)",
           "summary": "Button triggers an action in place: submitting a form, opening a dialog, saving, deleting."
         },
@@ -122,7 +122,7 @@
           "category": "Display",
           "status": "draft",
           "story": "Components/Display/Card",
-          "updated": "2026-10-28",
+          "updated": "2026-10-29",
           "component": "Card (import from @scorp-ds/components)",
           "summary": "Card is the standard container for a self-contained group of content on a page: a settings group, a profile, a testimonial, a deploy summary."
         },
@@ -158,7 +158,7 @@
           "category": "Inputs",
           "status": "draft",
           "story": "Components/Inputs/Checkbox",
-          "updated": "2026-09-22",
+          "updated": "2026-10-29",
           "component": "Checkbox (import from @scorp-ds/components)",
           "summary": "Checkbox lets users turn an independent option on or off, or pick any number of items from a list, usually as part of a form that is submitted later."
         },
@@ -182,7 +182,7 @@
           "category": "Inputs",
           "status": "draft",
           "story": "Components/Inputs/Combobox",
-          "updated": "2026-09-22",
+          "updated": "2026-10-29",
           "component": "Combobox (import from @scorp-ds/components)",
           "summary": "Text input with a filtered listbox for choosing one option from a long list."
         },
@@ -230,7 +230,7 @@
           "category": "Display",
           "status": "draft",
           "story": "Components/Display/Divider",
-          "updated": "2026-10-28",
+          "updated": "2026-10-29",
           "component": "Divider (import from @scorp-ds/components)",
           "summary": "Divider is a thin rule that separates groups of content within the same surface: sections of a form, items in a toolbar, blocks inside a Card body."
         },
@@ -242,7 +242,7 @@
           "category": "Overlays",
           "status": "draft",
           "story": "Components/Overlays/Dropdown",
-          "updated": "2026-10-28",
+          "updated": "2026-10-29",
           "component": "Dropdown (import from @scorp-ds/components)",
           "summary": "Dropdown is an action menu: a trigger that opens a short list of commands such as Edit, Duplicate, or Delete."
         },
@@ -290,7 +290,7 @@
           "category": "Inputs",
           "status": "draft",
           "story": "Components/Inputs/Input",
-          "updated": "2026-09-22",
+          "updated": "2026-10-29",
           "component": "Input (import from @scorp-ds/components)",
           "summary": "Input is the single-line text field for short free-form values: names, emails, search terms, codes."
         },
@@ -302,7 +302,7 @@
           "category": "Terminal",
           "status": "draft",
           "story": "Components/Terminal/Kbd",
-          "updated": "2026-10-28",
+          "updated": "2026-10-29",
           "component": "Kbd (import from @scorp-ds/components)",
           "summary": "KBD COMPONENT"
         },
@@ -338,7 +338,7 @@
           "category": "Terminal",
           "status": "draft",
           "story": "Components/Terminal/LogView",
-          "updated": "2026-10-28",
+          "updated": "2026-10-29",
           "component": "LogView (import from @scorp-ds/components)",
           "summary": "LOG VIEW COMPONENT"
         },
@@ -362,7 +362,7 @@
           "category": "Terminal",
           "status": "draft",
           "story": "Components/Terminal/Meter",
-          "updated": "2026-10-28",
+          "updated": "2026-10-29",
           "component": "Meter (import from @scorp-ds/components)",
           "summary": "METER COMPONENT"
         },
@@ -374,7 +374,7 @@
           "category": "Overlays",
           "status": "draft",
           "story": "Components/Overlays/Modal",
-          "updated": "2026-10-28",
+          "updated": "2026-10-29",
           "component": "Modal (import from @scorp-ds/components)",
           "summary": "Modal is a centered dialog over a scrim that interrupts the page for a task or decision the user must finish or dismiss before going back: confirmations, short forms, reward claims."
         },
@@ -386,7 +386,7 @@
           "category": "Navigation",
           "status": "draft",
           "story": "Components/Navigation/Pagination",
-          "updated": "2026-09-22",
+          "updated": "2026-10-29",
           "component": "Pagination (import from @scorp-ds/components)",
           "summary": "PAGINATION COMPONENT"
         },
@@ -410,7 +410,7 @@
           "category": "Feedback",
           "status": "draft",
           "story": "Components/Feedback/ProgressBar",
-          "updated": "2026-10-28",
+          "updated": "2026-10-29",
           "component": "ProgressBar (import from @scorp-ds/components)",
           "summary": "Shows task progress."
         },
@@ -458,7 +458,7 @@
           "category": "Feedback",
           "status": "draft",
           "story": "Components/Feedback/Skeleton",
-          "updated": "2026-10-28",
+          "updated": "2026-10-29",
           "component": "Skeleton (import from @scorp-ds/components)",
           "summary": "Placeholder blocks that hold the layout while content loads."
         },
@@ -482,7 +482,7 @@
           "category": "Feedback",
           "status": "draft",
           "story": "Components/Feedback/Spinner",
-          "updated": "2026-09-22",
+          "updated": "2026-10-29",
           "component": "Spinner (import from @scorp-ds/components)",
           "summary": "TUI loading indicator in the 1-bit icon language: eight square dots on an"
         },
@@ -554,7 +554,7 @@
           "category": "Inputs",
           "status": "draft",
           "story": "Components/Inputs/Textarea",
-          "updated": "2026-09-22",
+          "updated": "2026-10-29",
           "component": "Textarea (import from @scorp-ds/components)",
           "summary": "Textarea is the multi-line text field for longer free-form input: notes, feedback, descriptions."
         },
@@ -578,7 +578,7 @@
           "category": "Feedback",
           "status": "draft",
           "story": "Components/Feedback/Toast",
-          "updated": "2026-10-28",
+          "updated": "2026-10-29",
           "component": "Toast, Toaster, toast, useToast (import from @scorp-ds/components)",
           "summary": "Toast is a brief, non-blocking confirmation that rises from the bottom edge and goes away on its own: \"Copied to clipboard\", \"+40 XP\", \"Item deleted (Undo)\"."
         },
@@ -590,7 +590,7 @@
           "category": "Overlays",
           "status": "draft",
           "story": "Components/Overlays/Tooltip",
-          "updated": "2026-10-28",
+          "updated": "2026-10-29",
           "component": "Tooltip (import from @scorp-ds/components)",
           "summary": "Tooltip shows a short supplementary hint next to a trigger when it is hovered or focused, most often to name an icon-only button or add a detail to a label."
         },

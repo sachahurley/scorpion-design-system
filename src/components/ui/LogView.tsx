@@ -7,8 +7,7 @@
  * color is never the only signal), and the message.
  *
  * LEVELS: `level` is the logging domain's term, so it keeps its name
- * (decision 0024) but takes the shared role name `warning`. The old `warn`
- * still works, renders identically, and warns once in development.
+ * (decision 0024) but takes the shared role name `warning`.
  *
  * AUTO-SCROLL: with `autoScroll` (default on) the view follows new lines,
  * like `tail -f`. Scrolling up pauses following so the reader keeps their
@@ -29,20 +28,13 @@
  */
 
 import type { ReactNode } from "react";
-import { warnDeprecated } from "@/lib/deprecate";
 import { useFollowScroll } from "@/lib/use-follow-scroll";
 import { cn } from "@/lib/utils";
 import { Button } from "./Button";
 import { TuiIcon, type TuiIconName } from "./TuiIcon";
 
-/** @deprecated Use `"warning"`: it renders identically. */
-type DeprecatedLogLevel = "warn";
-
 /** Severity of a log line. Drives the icon, the text tag, and the tag color. */
-export type LogLevel = "info" | "warning" | "error" | "debug" | DeprecatedLogLevel;
-
-/** A level with the deprecated alias mapped onto its replacement. */
-type CanonicalLogLevel = Exclude<LogLevel, DeprecatedLogLevel>;
+export type LogLevel = "info" | "warning" | "error" | "debug";
 
 /** One line in the log. */
 export interface LogLine {
@@ -80,7 +72,7 @@ export interface LogViewProps {
   className?: string;
 }
 
-const LEVELS: Record<CanonicalLogLevel, { icon: TuiIconName; tag: string; tone: string }> = {
+const LEVELS: Record<LogLevel, { icon: TuiIconName; tag: string; tone: string }> = {
   info: { icon: "Info", tag: "INFO", tone: "text-info-700 dark:text-info-400" },
   warning: { icon: "AlertTriangle", tag: "WARN", tone: "text-warning-700 dark:text-warning-400" },
   error: { icon: "AlertCircle", tag: "ERROR", tone: "text-error-700 dark:text-error-400" },
@@ -117,9 +109,6 @@ export function LogView({
     onFollowChange,
   });
 
-  // Deprecated alias (decision 0024): `warn` renders as `warning` and warns once.
-  if (lines.some((l) => l.level === "warn")) warnDeprecated("LogView", 'level="warn"', 'level="warning"');
-
   // Keep the level column aligned for lines without a level.
   const hasLevels = lines.some((l) => l.level);
 
@@ -152,7 +141,7 @@ export function LogView({
           <p className="px-3 text-[var(--text-secondary)]">{emptyState}</p>
         ) : (
           lines.map((line, index) => {
-            const level = line.level ? LEVELS[line.level === "warn" ? "warning" : line.level] : null;
+            const level = line.level ? LEVELS[line.level] : null;
             return (
               <div
                 key={line.id}

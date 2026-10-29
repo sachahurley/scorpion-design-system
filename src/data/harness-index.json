@@ -19,7 +19,7 @@
     "baselines": 562,
     "lintRules": 17,
     "skills": 19,
-    "decisions": 30,
+    "decisions": 31,
     "insights": 6,
     "tokens": 427
   },
@@ -471,6 +471,12 @@
       "title": "Every state a component's API supports has a story",
       "affects": "Stories, doc requirements",
       "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0030-every-data-state-has-a-story.md"
+    },
+    {
+      "id": "0031",
+      "title": "The 0024 aliases are removed; Modal width stays",
+      "affects": "Every component that carried an alias, lib/size.ts",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0031-the-0024-aliases-are-removed.md"
     }
   ],
   "insights": [

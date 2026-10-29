@@ -20,8 +20,7 @@
  * - sm: 32px height
  * - md: 40px height (default)
  * - lg: 48px height
- * - icon: DEPRECATED alias for a 40px square. Icon-only buttons are detected
- *   automatically and squared at every size, so use `size="md"` instead.
+ * Icon-only buttons are detected automatically and squared at every size.
  *
  * ICON-ONLY BUTTONS: `variant` picks the look, `size` picks the dimension.
  * `variant="icon"` is the dedicated icon plate (`--button-icon-*`); any other
@@ -33,10 +32,7 @@
  */
 
 import { forwardRef, useEffect, type ButtonHTMLAttributes, type CSSProperties, type MouseEvent } from "react";
-import { resolveSize, type ControlSizeProp } from "@/lib/size";
-
-/** @deprecated Icon-only buttons are squared automatically at every size: use `md`. */
-type DeprecatedButtonSize = "icon";
+import type { ControlSize } from "@/lib/size";
 import { Spinner } from "./Spinner";
 import { renderIconSlot, type IconSlot } from "@/lib/icon-slot";
 
@@ -52,10 +48,9 @@ interface ButtonBaseProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 
   variant?: "primary" | "secondary" | "ghost" | "link" | "outline" | "destructive" | "icon";
   /**
    * Height: sm 32px, md 40px (default), lg 48px, from the control-height
-   * tokens. Legacy small/medium/large still work (deprecated). Icon-only buttons
-   * are squared automatically. `"icon"` is deprecated: use "md".
+   * tokens. Icon-only buttons are squared automatically.
    */
-  size?: ControlSizeProp | DeprecatedButtonSize;
+  size?: ControlSize;
   /** Disables the button (anchors drop `href` and set `aria-disabled`). */
   disabled?: boolean;
   /**
@@ -127,7 +122,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     { 
       variant = "primary", 
-      size: sizeProp = "md", 
+      size = "md", 
       disabled = false, 
       className = "", 
       children,
@@ -144,7 +139,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const size = resolveSize(sizeProp, "Button", "md" as "sm" | "md" | "lg" | "icon");
     // BASE STYLES - Applied to all buttons
     // Uses tokens: font.size.sm (14px)
     // Border radius is size-specific (see sizeStyles)
@@ -201,13 +195,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       }
     }, [variant, size, children, iconLeft, iconRight, ariaLabel, ariaLabelledBy]);
 
-    useEffect(() => {
-      if (import.meta.env.PROD || size !== "icon") return;
-      console.warn(
-        '[@scorp-ds/components] Button: size="icon" is deprecated. Icon-only buttons are squared automatically; use size="md".'
-      );
-    }, [size]);
-
     // SIZE STYLES - All values from tokens.json
     // Small: 32px height, 16px horizontal padding
     // Medium: 40px height, 20px horizontal padding
@@ -226,8 +213,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             return "size-control-sm plate-round";
           case "lg":
             return "size-control-lg plate-round";
-          case "icon":
-            return "size-control-md plate-round";
           default: // medium
             return "size-control-md plate-round";
         }
@@ -240,8 +225,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           return "h-control-sm px-4 py-1.5 plate-round";
         case "lg":
           return "h-control-lg px-6 py-3.5 plate-round";
-        case "icon":
-          return "size-control-md plate-round";
         default: // medium
           return "h-control-md px-5 py-2.5 plate-round";
       }
@@ -295,12 +278,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     // ICON SIZING - Icons scale with button size
-    // Small: 16px, Medium: 20px, Large: 24px, Icon: 20px
+    // Small: 16px, Medium: 20px, Large: 24px
     const iconSizeStyles = {
       sm: "w-4 h-4",    // 16px
       md: "w-5 h-5",   // 20px
       lg: "w-6 h-6",    // 24px
-      icon: "w-5 h-5",     // 20px
     };
 
     // GAP SPACING - Space between icon and text
@@ -312,7 +294,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       sm: "gap-1.5",    // 6px - tighter for visual balance in compact buttons
       md: "gap-2",     // 8px - standard spacing
       lg: "gap-2.5",    // 10px - more breathing room for larger buttons
-      icon: "gap-0",       // No gap for icon-only
     };
 
     // Helper function to wrap icons with proper sizing classes
@@ -343,20 +324,17 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       
       // If this is an icon-only button (any variant), wrap children with icon size classes
       if (iconOnly && children) {
-        // Determine the effective size (handle legacy "icon" size as "md")
-        const effectiveSize = size === "icon" ? "md" : size;
-        
         // Check if children is a single React element (icon)
         if (typeof children === 'object' && children !== null && 'type' in children) {
           return (
-            <span className={`inline-flex items-center justify-center shrink-0 ${iconSizeStyles[effectiveSize]}`}>
+            <span className={`inline-flex items-center justify-center shrink-0 ${iconSizeStyles[size]}`}>
               {children}
             </span>
           );
         }
         // If children is already wrapped or contains multiple elements, wrap the whole thing
         return (
-          <span className={`inline-flex items-center justify-center shrink-0 ${iconSizeStyles[effectiveSize]}`}>
+          <span className={`inline-flex items-center justify-center shrink-0 ${iconSizeStyles[size]}`}>
             {children}
           </span>
         );
@@ -390,7 +368,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       }
       onClick?.(e);
     };
-    const spinnerSize = size === "icon" ? "md" : size;
     const busyStyles = busy ? "relative cursor-progress" : "";
 
     // Content: while busy, the label stays in the layout (so the width holds)
@@ -408,7 +385,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <>
         <span className={`inline-flex items-center justify-center opacity-0 ${gapStyles[size]}`}>{content}</span>
         <span aria-hidden="true" className="absolute inset-0 flex items-center justify-center">
-          <Spinner size={spinnerSize} />
+          <Spinner size={size} />
         </span>
       </>
     ) : (

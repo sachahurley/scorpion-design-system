@@ -20,7 +20,7 @@
 
 import { Fragment, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { resolveSize, type ControlSizeProp } from "@/lib/size";
+import type { ControlSize } from "@/lib/size";
 
 export interface KbdProps {
   /**
@@ -36,7 +36,7 @@ export interface KbdProps {
    */
   children?: ReactNode;
   /** Key size: sm 20px (default) or md 24px. */
-  size?: Extract<ControlSizeProp, "sm" | "md" | "small" | "medium">;
+  size?: Extract<ControlSize, "sm" | "md">;
   /** Visible separator between combo keys (default "+"). */
   separator?: ReactNode;
   /** Extra classes for the outer `<kbd>`. */
@@ -77,8 +77,7 @@ function Key({ size, children, className }: { size: "sm" | "md"; children: React
  * <Kbd>Esc</Kbd>
  * ```
  */
-export function Kbd({ keys, children, size: sizeProp = "sm", separator = "+", className }: KbdProps) {
-  const size = resolveSize<"sm" | "md">(sizeProp, "Kbd", "sm");
+export function Kbd({ keys, children, size = "sm", separator = "+", className }: KbdProps) {
 
   if (!keys || keys.length <= 1) {
     return (

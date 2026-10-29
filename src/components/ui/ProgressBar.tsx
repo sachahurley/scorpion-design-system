@@ -24,12 +24,11 @@
  * - text.primary, text.secondary, duration.fast (indeterminate hop interval)
  *
  * TONES: `tone` takes decision 0024's five roles plus ProgressBar's own
- * `primary`, the default accent. The deprecated `variant` still works.
+ * `primary`, the default accent.
  */
 
 import { useEffect, useId, useState } from "react";
-import { warnDeprecated } from "@/lib/deprecate";
-import { resolveSize, type ControlSizeProp } from "@/lib/size";
+import type { ControlSize } from "@/lib/size";
 import { cn } from "@/lib/utils";
 
 /** Fill colour of a ProgressBar: the five semantic roles plus `primary`, the default accent. */
@@ -47,14 +46,9 @@ export interface ProgressBarProps {
   /** Show the percentage next to the label for determinate bars (default true). */
   showValue?: boolean;
   /** Track thickness: sm, md (default), lg. */
-  size?: ControlSizeProp;
+  size?: ControlSize;
   /** Fill colour by meaning: primary (the default accent), or a semantic role: neutral, info, success, warning, error. */
   tone?: ProgressBarTone;
-  /**
-   * Fill colour under its old name. When both are set, `tone` wins.
-   * @deprecated Use `tone`.
-   */
-  variant?: "primary" | "success" | "warning" | "error";
   /** Number of blocks across the track (default 20, so each block is 5%). */
   segments?: number;
   /** Extra classes for the root (width). */
@@ -119,17 +113,11 @@ export function ProgressBar({
   label,
   showLabel = true,
   showValue = true,
-  size: sizeProp = "md",
-  tone: toneProp,
-  variant,
+  size = "md",
+  tone = "primary",
   segments = 20,
   className,
 }: ProgressBarProps) {
-  const size = resolveSize(sizeProp, "ProgressBar");
-  // Deprecated alias (decision 0024): `variant` keeps working, warns once, and
-  // loses to `tone` when both are passed.
-  if (variant !== undefined) warnDeprecated("ProgressBar", "variant", "tone");
-  const tone: ProgressBarTone = toneProp ?? variant ?? "primary";
   const labelId = useId();
   const indeterminate = value == null || Number.isNaN(value);
   const safeMax = max > 0 ? max : 100;

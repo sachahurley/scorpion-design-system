@@ -20,8 +20,7 @@
  *
  * TONES: neutral | info | success | warning | error (decision 0024), with the
  * same 1-bit severity icons and semantic colors as Alert (neutral Bell, info
- * Info, success CheckCircle, warning AlertTriangle, error AlertCircle). The
- * deprecated `variant` still works; its `default` maps to `neutral`.
+ * Info, success CheckCircle, warning AlertTriangle, error AlertCircle).
  *
  * TIMING: imperative toasts auto-dismiss after 5000ms; the timer pauses while
  * the plate is hovered or holds focus, and `duration: Infinity` persists
@@ -38,22 +37,10 @@
  */
 
 import { useEffect, useRef, useState, useSyncExternalStore, type FocusEvent, type ReactNode } from "react";
-import { warnDeprecated } from "@/lib/deprecate";
 import { TuiIcon, type TuiIconName } from "./TuiIcon";
 
 /** Severity of a toast; picks the icon, colors, and live-region role (`error` is announced assertively). */
 export type ToastTone = "neutral" | "info" | "success" | "warning" | "error";
-
-/**
- * Severity of a toast under its old name, where `default` meant `neutral`.
- * @deprecated Use `ToastTone` and the `tone` prop.
- */
-export type ToastVariant = "default" | "success" | "warning" | "error" | "info";
-
-/** Maps a deprecated variant onto its tone (`default` became `neutral`). */
-function toneFromVariant(variant: ToastVariant | undefined): ToastTone | undefined {
-  return variant === "default" ? "neutral" : variant;
-}
 
 /** A single inline action on a toast, e.g. `{ label: "Undo", onClick: restore }`. */
 export interface ToastAction {
@@ -71,11 +58,6 @@ export interface ToastItem {
   message: ReactNode;
   /** Severity (default: "neutral"). "error" is announced assertively. */
   tone?: ToastTone;
-  /**
-   * Severity under its old name; `default` maps to `neutral`. When both are set, `tone` wins.
-   * @deprecated Use `tone`.
-   */
-  variant?: ToastVariant;
   /** Optional inline action, such as Undo. */
   action?: ToastAction;
   /**
@@ -105,11 +87,6 @@ export interface ToastProps {
   onClick?: () => void;
   /** Severity (default: "neutral"): icon, colors, and `role` (error = alert). */
   tone?: ToastTone;
-  /**
-   * Severity under its old name; `default` maps to `neutral`. When both are set, `tone` wins.
-   * @deprecated Use `tone`.
-   */
-  variant?: ToastVariant;
   /** Optional inline action button, such as Undo. Pressing it also dismisses. */
   action?: ToastAction;
   /**
@@ -177,11 +154,7 @@ const INLINE_BUTTON = `
  * A single toast plate. Usually rendered via `Toaster`, but exported for
  * custom placements. Announced via `role="status"` (`role="alert"` for errors).
  */
-export function Toast({ children, onClick, tone: toneProp, variant, action, duration, onDismiss }: ToastProps) {
-  // Deprecated alias (decision 0024): `variant` keeps working, warns once, and
-  // loses to `tone` when both are passed.
-  if (variant !== undefined) warnDeprecated("Toast", "variant", "tone");
-  const tone: ToastTone = toneProp ?? toneFromVariant(variant) ?? "neutral";
+export function Toast({ children, onClick, tone = "neutral", action, duration, onDismiss }: ToastProps) {
   // Rise-in: start below, hop up on mount. steps(5) matches the portfolio's
   // "physical plate" motion: no fade, position snaps on a pixel grid.
   const [entered, setEntered] = useState(false);
@@ -283,11 +256,6 @@ export function Toast({ children, onClick, tone: toneProp, variant, action, dura
 export interface ToastOptions {
   /** Severity (default: "neutral"). The `toast.success()` style helpers set it for you. */
   tone?: ToastTone;
-  /**
-   * Severity under its old name; `default` maps to `neutral`. When both are set, `tone` wins.
-   * @deprecated Use `tone`.
-   */
-  variant?: ToastVariant;
   /** Optional inline action, such as Undo. */
   action?: ToastAction;
   /** Milliseconds before auto-dismiss (default 5000); `Infinity` persists. */
@@ -296,7 +264,7 @@ export interface ToastOptions {
   id?: ToastItem["id"];
 }
 
-type ShowToast = (message: ReactNode, options?: Omit<ToastOptions, "tone" | "variant">) => ToastItem["id"];
+type ShowToast = (message: ReactNode, options?: Omit<ToastOptions, "tone">) => ToastItem["id"];
 
 /** The `toast` function plus its severity helpers and `dismiss`. */
 export interface ToastApi {
@@ -336,12 +304,9 @@ const getSnapshot = () => queue;
 const getServerSnapshot = () => EMPTY;
 
 function show(message: ReactNode, options: ToastOptions = {}): ToastItem["id"] {
-  const { id = `toast-${++seq}`, duration = DEFAULT_DURATION, tone, variant, ...rest } = options;
-  // Normalise the deprecated `variant` here, so queued items only carry `tone`.
-  if (variant !== undefined) warnDeprecated("toast()", "variant", "tone");
-  const resolved = tone ?? toneFromVariant(variant);
+  const { id = `toast-${++seq}`, duration = DEFAULT_DURATION, tone, ...rest } = options;
   const item: ToastItem = { id, message, duration, ...rest };
-  if (resolved !== undefined) item.tone = resolved;
+  if (tone !== undefined) item.tone = tone;
   setQueue([...queue.filter((t) => t.id !== id), item]);
   return id;
 }
@@ -361,10 +326,10 @@ function dismiss(id?: ToastItem["id"]) {
  * const id = toast("Syncing", { duration: Infinity }); toast.dismiss(id);
  */
 export const toast: ToastApi = Object.assign(show, {
-  success: (message: ReactNode, options?: Omit<ToastOptions, "tone" | "variant">) => show(message, { ...options, tone: "success" }),
-  warning: (message: ReactNode, options?: Omit<ToastOptions, "tone" | "variant">) => show(message, { ...options, tone: "warning" }),
-  error: (message: ReactNode, options?: Omit<ToastOptions, "tone" | "variant">) => show(message, { ...options, tone: "error" }),
-  info: (message: ReactNode, options?: Omit<ToastOptions, "tone" | "variant">) => show(message, { ...options, tone: "info" }),
+  success: (message: ReactNode, options?: Omit<ToastOptions, "tone">) => show(message, { ...options, tone: "success" }),
+  warning: (message: ReactNode, options?: Omit<ToastOptions, "tone">) => show(message, { ...options, tone: "warning" }),
+  error: (message: ReactNode, options?: Omit<ToastOptions, "tone">) => show(message, { ...options, tone: "error" }),
+  info: (message: ReactNode, options?: Omit<ToastOptions, "tone">) => show(message, { ...options, tone: "info" }),
   dismiss,
 });
 
@@ -405,7 +370,6 @@ export function Toaster({ toasts, onDismiss }: ToasterProps) {
         <Toast
           key={t.id}
           tone={t.tone}
-          variant={t.variant}
           action={t.action}
           duration={t.duration}
           onClick={handleDismiss ? () => handleDismiss(t.id) : undefined}

@@ -31,11 +31,11 @@
 
 import { forwardRef, type InputHTMLAttributes, type ReactNode } from "react";
 import { FieldMessage, useFieldMessage } from "@/lib/field";
-import { resolveSize, type ControlSizeProp } from "@/lib/size";
+import type { ControlSize } from "@/lib/size";
 
 export interface RadioProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
   /** Box size: sm 16px, md 20px (default), lg 24px. The tap target is 44×44px at every size. */
-  size?: ControlSizeProp;
+  size?: ControlSize;
   /** Visible label next to the box; clicking it selects the radio. Without one, pass `aria-label`. */
   label?: string | ReactNode;
   /**
@@ -77,7 +77,7 @@ export interface RadioProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
 export const Radio = forwardRef<HTMLInputElement, RadioProps>(
   (
     {
-      size: sizeProp = "md",
+      size = "md",
       label,
       error: errorProp = false,
       helperText,
@@ -92,7 +92,6 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(
     },
     ref
   ) => {
-    const size = resolveSize(sizeProp, "Radio");
     // Helper and error text share the Checkbox / Input plumbing: one place
     // owns the message id and `aria-describedby`. The radio uses `invalid`
     // for styling only; see the input below for where aria-invalid goes.

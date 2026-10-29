@@ -27,7 +27,7 @@
 
 import { useId, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { resolveSize, type ControlSizeProp } from "@/lib/size";
+import type { ControlSize } from "@/lib/size";
 import { TuiIcon } from "./TuiIcon";
 
 /**
@@ -61,7 +61,7 @@ export interface MeterProps {
   /** Number of blocks the range is divided into (default 20). */
   segments?: number;
   /** Block height: sm 8px, md 12px (default). */
-  size?: Extract<ControlSizeProp, "sm" | "md" | "small" | "medium">;
+  size?: Extract<ControlSize, "sm" | "md">;
   /** Extra classes for the wrapper. */
   className?: string;
 }
@@ -114,10 +114,9 @@ export function Meter({
   valueText,
   tone: toneProp,
   segments = 20,
-  size: sizeProp = "md",
+  size = "md",
   className,
 }: MeterProps) {
-  const size = resolveSize<"sm" | "md">(sizeProp, "Meter");
   const labelId = useId();
   const span = max - min || 1;
   const clamped = Math.min(Math.max(value, min), max);

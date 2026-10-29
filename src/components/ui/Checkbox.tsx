@@ -29,11 +29,11 @@
 import { forwardRef, useCallback, useLayoutEffect, useRef, type InputHTMLAttributes, type ReactNode } from "react";
 import { FieldMessage, useFieldMessage } from "@/lib/field";
 import { TuiIcon } from "./TuiIcon";
-import { resolveSize, type ControlSizeProp } from "@/lib/size";
+import type { ControlSize } from "@/lib/size";
 
 export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
   /** Box size. The tap target is 44×44px at every size. */
-  size?: ControlSizeProp;
+  size?: ControlSize;
   /** Visible label; clicking it toggles the box. Without one, pass `aria-label`. */
   label?: string | ReactNode;
   /** Error styling without a message. Prefer `errorMessage` so users learn what to fix. */
@@ -72,7 +72,7 @@ export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
   (
     {
-      size: sizeProp = "md",
+      size = "md",
       label,
       error: errorProp = false,
       helperText,
@@ -88,7 +88,6 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     },
     ref
   ) => {
-    const size = resolveSize(sizeProp, "Checkbox");
 
     // INDETERMINATE has no HTML attribute, only a DOM property, so it is set
     // through a ref merged with the forwarded one. Runs after every render:
