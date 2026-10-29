@@ -18,9 +18,10 @@
  *    renders a queue the app owns. Items only auto-dismiss when they set a
  *    `duration`, so existing callers keep their own timing.
  *
- * VARIANTS: default | success | warning | error | info, with the same 1-bit
- * severity icons and semantic colors as Alert (default Bell, info Info,
- * success CheckCircle, warning AlertTriangle, error AlertCircle).
+ * TONES: neutral | info | success | warning | error (decision 0024), with the
+ * same 1-bit severity icons and semantic colors as Alert (neutral Bell, info
+ * Info, success CheckCircle, warning AlertTriangle, error AlertCircle). The
+ * deprecated `variant` still works; its `default` maps to `neutral`.
  *
  * TIMING: imperative toasts auto-dismiss after 5000ms; the timer pauses while
  * the plate is hovered or holds focus, and `duration: Infinity` persists
@@ -30,17 +31,29 @@
  * `role="alert"` (announced immediately), all others `role="status"`.
  *
  * TOKENS USED:
- * - plate.round (silhouette); default: border.hairline (ring), surface.muted (fill)
- * - variants: success / warning / error / info 50, 300, 700, 950 scales (as Alert)
+ * - plate.round (silhouette); neutral: border.hairline (ring), surface.muted (fill)
+ * - tones: success / warning / error / info 50, 300, 700, 950 scales (as Alert)
  * - text.primary, duration.normal + steps(5) (motion), focus.ring.*
  * - z-index.popover (toasts stack above modals by decision)
  */
 
 import { useEffect, useRef, useState, useSyncExternalStore, type FocusEvent, type ReactNode } from "react";
+import { warnDeprecated } from "@/lib/deprecate";
 import { TuiIcon, type TuiIconName } from "./TuiIcon";
 
-/** Severity of a toast; picks the icon, colors, and live-region role. */
+/** Severity of a toast; picks the icon, colors, and live-region role (`error` is announced assertively). */
+export type ToastTone = "neutral" | "info" | "success" | "warning" | "error";
+
+/**
+ * Severity of a toast under its old name, where `default` meant `neutral`.
+ * @deprecated Use `ToastTone` and the `tone` prop.
+ */
 export type ToastVariant = "default" | "success" | "warning" | "error" | "info";
+
+/** Maps a deprecated variant onto its tone (`default` became `neutral`). */
+function toneFromVariant(variant: ToastVariant | undefined): ToastTone | undefined {
+  return variant === "default" ? "neutral" : variant;
+}
 
 /** A single inline action on a toast, e.g. `{ label: "Undo", onClick: restore }`. */
 export interface ToastAction {
@@ -56,7 +69,12 @@ export interface ToastItem {
   id: string | number;
   /** Toast content. Keep it to one short line. */
   message: ReactNode;
-  /** Severity (default: "default"). "error" is announced assertively. */
+  /** Severity (default: "neutral"). "error" is announced assertively. */
+  tone?: ToastTone;
+  /**
+   * Severity under its old name; `default` maps to `neutral`. When both are set, `tone` wins.
+   * @deprecated Use `tone`.
+   */
   variant?: ToastVariant;
   /** Optional inline action, such as Undo. */
   action?: ToastAction;
@@ -85,7 +103,12 @@ export interface ToastProps {
   children: ReactNode;
   /** Called when the plate is clicked (pointer shortcut; wire to dismiss). */
   onClick?: () => void;
-  /** Severity (default: "default"): icon, colors, and `role` (error = alert). */
+  /** Severity (default: "neutral"): icon, colors, and `role` (error = alert). */
+  tone?: ToastTone;
+  /**
+   * Severity under its old name; `default` maps to `neutral`. When both are set, `tone` wins.
+   * @deprecated Use `tone`.
+   */
   variant?: ToastVariant;
   /** Optional inline action button, such as Undo. Pressing it also dismisses. */
   action?: ToastAction;
@@ -99,18 +122,18 @@ export interface ToastProps {
 }
 
 // Same icon per severity as Alert, so the two read as one family.
-const VARIANT_ICONS: Record<ToastVariant, TuiIconName> = {
-  default: "Bell",
+const TONE_ICONS: Record<ToastTone, TuiIconName> = {
+  neutral: "Bell",
   success: "CheckCircle",
   warning: "AlertTriangle",
   error: "AlertCircle",
   info: "Info",
 };
 
-// PLATE RING RECIPE per variant: `ring` paints the outer layer, `fill` the
+// PLATE RING RECIPE per tone: `ring` paints the outer layer, `fill` the
 // inner layer 1px inset. Colors match Alert's semantic pairs.
-const VARIANT_STYLES: Record<ToastVariant, { ring: string; fill: string; icon: string; text: string }> = {
-  default: {
+const TONE_STYLES: Record<ToastTone, { ring: string; fill: string; icon: string; text: string }> = {
+  neutral: {
     ring: "bg-[var(--border-hairline)]",
     fill: "bg-[var(--surface-muted)]",
     icon: "text-secondary-800 dark:text-secondary-300",
@@ -154,7 +177,11 @@ const INLINE_BUTTON = `
  * A single toast plate. Usually rendered via `Toaster`, but exported for
  * custom placements. Announced via `role="status"` (`role="alert"` for errors).
  */
-export function Toast({ children, onClick, variant = "default", action, duration, onDismiss }: ToastProps) {
+export function Toast({ children, onClick, tone: toneProp, variant, action, duration, onDismiss }: ToastProps) {
+  // Deprecated alias (decision 0024): `variant` keeps working, warns once, and
+  // loses to `tone` when both are passed.
+  if (variant !== undefined) warnDeprecated("Toast", "variant", "tone");
+  const tone: ToastTone = toneProp ?? toneFromVariant(variant) ?? "neutral";
   // Rise-in: start below, hop up on mount. steps(5) matches the portfolio's
   // "physical plate" motion: no fade, position snaps on a pixel grid.
   const [entered, setEntered] = useState(false);
@@ -191,13 +218,13 @@ export function Toast({ children, onClick, variant = "default", action, duration
     if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocused(false);
   };
 
-  const styles = VARIANT_STYLES[variant];
+  const styles = TONE_STYLES[tone];
   const persistent = duration === Infinity && onDismiss != null;
 
   return (
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events -- pointer shortcut to dismiss; the dismiss and action buttons are the keyboard path
     <div
-      role={variant === "error" ? "alert" : "status"}
+      role={tone === "error" ? "alert" : "status"}
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -214,7 +241,7 @@ export function Toast({ children, onClick, variant = "default", action, duration
         className={`plate-round flex max-w-[min(28rem,calc(100vw-2rem))] items-center gap-2 px-3 py-2.5 font-mono text-sm ${styles.fill} ${styles.text}`}
       >
         <span className={`inline-flex shrink-0 ${styles.icon}`}>
-          <TuiIcon name={VARIANT_ICONS[variant]} size="4" />
+          <TuiIcon name={TONE_ICONS[tone]} size="4" />
         </span>
         <span className="min-w-0 whitespace-nowrap overflow-hidden text-ellipsis">{children}</span>
         {action && (
@@ -254,7 +281,12 @@ export function Toast({ children, onClick, variant = "default", action, duration
 
 /** Options for `toast()`; everything but the message is optional. */
 export interface ToastOptions {
-  /** Severity (default: "default"). The `toast.success()` style helpers set it for you. */
+  /** Severity (default: "neutral"). The `toast.success()` style helpers set it for you. */
+  tone?: ToastTone;
+  /**
+   * Severity under its old name; `default` maps to `neutral`. When both are set, `tone` wins.
+   * @deprecated Use `tone`.
+   */
   variant?: ToastVariant;
   /** Optional inline action, such as Undo. */
   action?: ToastAction;
@@ -264,7 +296,7 @@ export interface ToastOptions {
   id?: ToastItem["id"];
 }
 
-type ShowToast = (message: ReactNode, options?: Omit<ToastOptions, "variant">) => ToastItem["id"];
+type ShowToast = (message: ReactNode, options?: Omit<ToastOptions, "tone" | "variant">) => ToastItem["id"];
 
 /** The `toast` function plus its severity helpers and `dismiss`. */
 export interface ToastApi {
@@ -304,8 +336,13 @@ const getSnapshot = () => queue;
 const getServerSnapshot = () => EMPTY;
 
 function show(message: ReactNode, options: ToastOptions = {}): ToastItem["id"] {
-  const { id = `toast-${++seq}`, duration = DEFAULT_DURATION, ...rest } = options;
-  setQueue([...queue.filter((t) => t.id !== id), { id, message, duration, ...rest }]);
+  const { id = `toast-${++seq}`, duration = DEFAULT_DURATION, tone, variant, ...rest } = options;
+  // Normalise the deprecated `variant` here, so queued items only carry `tone`.
+  if (variant !== undefined) warnDeprecated("toast()", "variant", "tone");
+  const resolved = tone ?? toneFromVariant(variant);
+  const item: ToastItem = { id, message, duration, ...rest };
+  if (resolved !== undefined) item.tone = resolved;
+  setQueue([...queue.filter((t) => t.id !== id), item]);
   return id;
 }
 
@@ -324,10 +361,10 @@ function dismiss(id?: ToastItem["id"]) {
  * const id = toast("Syncing", { duration: Infinity }); toast.dismiss(id);
  */
 export const toast: ToastApi = Object.assign(show, {
-  success: (message: ReactNode, options?: Omit<ToastOptions, "variant">) => show(message, { ...options, variant: "success" }),
-  warning: (message: ReactNode, options?: Omit<ToastOptions, "variant">) => show(message, { ...options, variant: "warning" }),
-  error: (message: ReactNode, options?: Omit<ToastOptions, "variant">) => show(message, { ...options, variant: "error" }),
-  info: (message: ReactNode, options?: Omit<ToastOptions, "variant">) => show(message, { ...options, variant: "info" }),
+  success: (message: ReactNode, options?: Omit<ToastOptions, "tone" | "variant">) => show(message, { ...options, tone: "success" }),
+  warning: (message: ReactNode, options?: Omit<ToastOptions, "tone" | "variant">) => show(message, { ...options, tone: "warning" }),
+  error: (message: ReactNode, options?: Omit<ToastOptions, "tone" | "variant">) => show(message, { ...options, tone: "error" }),
+  info: (message: ReactNode, options?: Omit<ToastOptions, "tone" | "variant">) => show(message, { ...options, tone: "info" }),
   dismiss,
 });
 
@@ -367,6 +404,7 @@ export function Toaster({ toasts, onDismiss }: ToasterProps) {
       {items.map((t) => (
         <Toast
           key={t.id}
+          tone={t.tone}
           variant={t.variant}
           action={t.action}
           duration={t.duration}

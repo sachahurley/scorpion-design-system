@@ -25,7 +25,7 @@
  * - Full light/dark theme support
  * 
  * DIMENSIONS:
- * - Width: 740px fixed
+ * - Width: `size` sm 360px, md 640px, lg 740px (default), full viewport
  * - Max height: 80% of viewport height
  *
  * SHAPE: the panel is a large plate (--plate-round-lg, stepped one-bit corners)
@@ -40,10 +40,12 @@
  * - plate.round-lg: panel silhouette
  */
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Button } from "./Button";
 import { TuiIcon } from "./TuiIcon";
 import { useFocusTrap } from "@/lib/use-focus-trap";
+import { useControllableState } from "@/lib/use-controllable-state";
+import { warnDeprecated } from "@/lib/deprecate";
 
 /**
  * Value of `global.breakpoint.docked` in tokens.json, used only where the
@@ -69,12 +71,36 @@ function dockedMediaQuery(): string {
   return `(min-width: ${px}px)`;
 }
 
-// Define the props interface for the Modal component
+/**
+ * Panel width per `size`. `lg` (740px) is the long-standing default; `md` is
+ * the docked compare card; `sm` fits a short confirmation or a celebratory
+ * notice; `full` asks for the whole viewport and is capped by `max-w-full`
+ * (the scrim padding, or the viewport when docked). There are no width
+ * tokens: like the old `width` default, these are component geometry.
+ */
+const MODAL_WIDTHS = { sm: "360px", md: "640px", lg: "740px", full: "100vw" } as const;
+
 export interface ModalProps {
-  /** Whether the dialog is shown. The parent owns this state: set it true to open, and false from `onClose`. */
-  isOpen: boolean;
-  /** Called when the user asks to close (close button, Escape, or a scrim click). Set `isOpen` to false here. */
-  onClose: () => void;
+  /**
+   * Whether the dialog is shown. Pass it with `onOpenChange` to control the
+   * dialog: set it true to open, and false when `onOpenChange(false)` fires.
+   * Omit it (and use `defaultOpen`) for a dialog that manages its own state.
+   */
+  open?: boolean;
+  /**
+   * Initial open state when `open` is not passed (default false). The dialog
+   * then closes itself on Escape, the scrim or the close button.
+   */
+  defaultOpen?: boolean;
+  /**
+   * Called with `false` when the user asks to close (close button, Escape, or
+   * a scrim click). Set `open` to false here when the dialog is controlled.
+   */
+  onOpenChange?: (open: boolean) => void;
+  /** @deprecated Use `open`. Still honoured when `open` is not passed. */
+  isOpen?: boolean;
+  /** @deprecated Use `onOpenChange`. Still called whenever `onOpenChange(false)` is. */
+  onClose?: () => void;
   /** Heading in the fixed header; also the dialog's accessible name, so make it say what the dialog is for. */
   title: string;
   /** Body content. It scrolls inside the panel when it is taller than the viewport allows; header and footer stay fixed. */
@@ -85,8 +111,15 @@ export interface ModalProps {
    */
   footerContent?: ReactNode;
   /**
-   * Panel width (default 740). Numbers are px; strings pass through
-   * (e.g. "min(320px, 90vw)"). Small celebratory dialogs want ~320.
+   * Panel width: `sm` (360px) for a short confirmation or notice, `md`
+   * (640px) for a compare card or a short form, `lg` (740px, the default
+   * when neither `size` nor `width` is passed) for a full task, `full` for
+   * the whole viewport width. The panel never grows past the viewport.
+   */
+  size?: "sm" | "md" | "lg" | "full";
+  /**
+   * @deprecated Use `size`. Still honoured when `size` is not passed:
+   * numbers are px, strings pass through.
    */
   width?: number | string;
   /**
@@ -102,7 +135,45 @@ export interface ModalProps {
 /**
  * A dialog that interrupts the page for a focused task or a confirmation; it traps focus (except when `docked`) and closes on Escape, the scrim or the close button.
  */
-export function Modal({ isOpen, onClose, title, children, footerContent, width = 740, docked = false }: ModalProps) {
+export function Modal({
+  open: openProp,
+  defaultOpen = false,
+  onOpenChange,
+  isOpen: isOpenProp,
+  onClose,
+  title,
+  children,
+  footerContent,
+  size,
+  width,
+  docked = false,
+}: ModalProps) {
+  if (isOpenProp !== undefined) warnDeprecated("Modal", "isOpen", "open");
+  if (onClose !== undefined) warnDeprecated("Modal", "onClose", "onOpenChange");
+  if (width !== undefined) warnDeprecated("Modal", "width", "size");
+
+  // `open` wins over the deprecated `isOpen`; passing either makes the dialog controlled.
+  const [isOpen, setOpenState] = useControllableState({
+    value: openProp ?? isOpenProp,
+    defaultValue: defaultOpen,
+    onChange: onOpenChange,
+  });
+  // Every dismissal path (close button, Escape, scrim) lands here, so the
+  // deprecated `onClose` fires exactly when `onOpenChange(false)` does.
+  const requestClose = useCallback(() => {
+    if (!isOpen) return;
+    setOpenState(false);
+    onClose?.();
+  }, [isOpen, setOpenState, onClose]);
+
+  // `size` wins over the deprecated `width`; with neither, the panel is `lg`.
+  const panelWidth =
+    size !== undefined || width === undefined
+      ? MODAL_WIDTHS[size ?? "lg"]
+      : typeof width === "number"
+        ? `${width}px`
+        : width;
+
   const panelRef = useRef<HTMLDivElement>(null);
   const prevFocusRef = useRef<HTMLElement | null>(null);
 
@@ -161,7 +232,7 @@ export function Modal({ isOpen, onClose, title, children, footerContent, width =
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        onClose();
+        requestClose();
       }
     };
 
@@ -174,7 +245,7 @@ export function Modal({ isOpen, onClose, title, children, footerContent, width =
     return () => {
       document.removeEventListener("keydown", handleEscape);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, requestClose]);
 
   // EFFECT: Prevent body scroll when modal is open. Docked mode is
   // non-modal, so the page keeps scrolling underneath.
@@ -204,7 +275,7 @@ export function Modal({ isOpen, onClose, title, children, footerContent, width =
           ref={panelRef}
           tabIndex={-1}
           className="max-w-full max-h-[80vh] plate-round-lg p-px bg-[var(--surface-container-stroke)] flex focus:outline-none"
-          style={{ width: typeof width === "number" ? `${width}px` : width }}
+          style={{ width: panelWidth }}
           role="dialog"
           aria-modal={isDocked ? undefined : "true"}
           aria-label={title}
@@ -234,20 +305,20 @@ export function Modal({ isOpen, onClose, title, children, footerContent, width =
               Checkbox, which hangs the pseudo off the wrapper outside the plate).
               The wrapper forwards only clicks that land on the pseudo ring
               (target === the wrapper itself); clicks on the button bubble up with
-              a different target and are ignored, so onClose fires exactly once.
+              a different target and are ignored, so the close fires exactly once.
             */}
             {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- enlarges the close button hit area for pointers; the button itself is the keyboard path */}
             <span
               className="relative ml-4 inline-flex shrink-0 before:content-[''] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-touch before:h-touch"
               onClick={(e) => {
-                if (e.target === e.currentTarget) onClose();
+                if (e.target === e.currentTarget) requestClose();
               }}
             >
               <Button
                 variant="secondary"
                 size="sm"
                 type="button"
-                onClick={onClose}
+                onClick={requestClose}
                 aria-label="Close modal"
               >
                 <TuiIcon name="X" />
@@ -324,7 +395,7 @@ export function Modal({ isOpen, onClose, title, children, footerContent, width =
           closing ? "animate-out fade-out fill-mode-forwards" : "animate-in fade-in"
         }`}
         style={{ zIndex: "var(--z-index-modal)", animationDuration: "var(--duration-normal)" }}
-        onClick={onClose}
+        onClick={requestClose}
         onAnimationEnd={() => {
           if (closing) setVisible(false);
         }}

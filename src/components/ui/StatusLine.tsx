@@ -23,7 +23,7 @@
 
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { TuiIcon, type TuiIconName } from "./TuiIcon";
+import { renderIconSlot, type IconSlot } from "@/lib/icon-slot";
 
 /** Semantic tone of a status segment. */
 export type StatusLineTone = "neutral" | "primary" | "success" | "warning" | "error" | "info";
@@ -91,8 +91,8 @@ export function StatusLine({
 StatusLine.displayName = "StatusLine";
 
 export interface StatusLineSegmentProps {
-  /** 1-bit icon before the text. Use one with any non-neutral tone. */
-  icon?: TuiIconName;
+  /** Icon before the text, a TuiIcon name or an element. Use one with any non-neutral tone. */
+  icon?: IconSlot;
   /** Semantic tone (default "neutral"). */
   tone?: StatusLineTone;
   /** Segment text. Keep it to a few words. */
@@ -108,7 +108,7 @@ export function StatusLineSegment({ icon, tone = "neutral", children, className 
       data-tone={tone}
       className={cn("inline-flex min-w-0 items-center gap-1.5 whitespace-nowrap px-3", TONES[tone], className)}
     >
-      {icon && <TuiIcon name={icon} size="3" className="shrink-0" />}
+      {icon && renderIconSlot(icon, { size: "3", className: "shrink-0" })}
       <span className="truncate">{children}</span>
     </span>
   );

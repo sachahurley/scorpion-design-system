@@ -19,13 +19,21 @@
  *
  * TOKENS USED:
  * - border.default (ring), surface.subtle (track), surface.muted (empty blocks)
- * - primary / success / warning / error scales (filled blocks)
+ * - primary / neutral (secondary) / info / success / warning / error scales
+ *   (filled blocks)
  * - text.primary, text.secondary, duration.fast (indeterminate hop interval)
+ *
+ * TONES: `tone` takes decision 0024's five roles plus ProgressBar's own
+ * `primary`, the default accent. The deprecated `variant` still works.
  */
 
 import { useEffect, useId, useState } from "react";
+import { warnDeprecated } from "@/lib/deprecate";
 import { resolveSize, type ControlSizeProp } from "@/lib/size";
 import { cn } from "@/lib/utils";
+
+/** Fill colour of a ProgressBar: the five semantic roles plus `primary`, the default accent. */
+export type ProgressBarTone = "primary" | "neutral" | "info" | "success" | "warning" | "error";
 
 export interface ProgressBarProps {
   /** Current progress, 0 to `max`. Omit (or pass `null`) for an indeterminate bar. */
@@ -40,7 +48,12 @@ export interface ProgressBarProps {
   showValue?: boolean;
   /** Track thickness: sm, md (default), lg. */
   size?: ControlSizeProp;
-  /** Fill color by meaning: primary (default accent), success, warning, error. */
+  /** Fill colour by meaning: primary (the default accent), or a semantic role: neutral, info, success, warning, error. */
+  tone?: ProgressBarTone;
+  /**
+   * Fill colour under its old name. When both are set, `tone` wins.
+   * @deprecated Use `tone`.
+   */
   variant?: "primary" | "success" | "warning" | "error";
   /** Number of blocks across the track (default 20, so each block is 5%). */
   segments?: number;
@@ -48,8 +61,10 @@ export interface ProgressBarProps {
   className?: string;
 }
 
-const FILL: Record<NonNullable<ProgressBarProps["variant"]>, string> = {
+const FILL: Record<ProgressBarTone, string> = {
   primary: "bg-primary-500 dark:bg-primary-400",
+  neutral: "bg-secondary-600 dark:bg-secondary-400",
+  info: "bg-info-600 dark:bg-info-400",
   success: "bg-success-600 dark:bg-success-400",
   warning: "bg-warning-600 dark:bg-warning-400",
   error: "bg-error-600 dark:bg-error-400",
@@ -95,7 +110,7 @@ function usePrefersReducedMotion() {
  *
  * @param value - Progress toward `max`; omit for indeterminate
  * @param label - Accessible name (visible by default)
- * @param variant - primary, success, warning, error
+ * @param tone - primary (default), neutral, info, success, warning, error
  * @param size - sm, md, lg track thickness
  */
 export function ProgressBar({
@@ -105,11 +120,16 @@ export function ProgressBar({
   showLabel = true,
   showValue = true,
   size: sizeProp = "md",
-  variant = "primary",
+  tone: toneProp,
+  variant,
   segments = 20,
   className,
 }: ProgressBarProps) {
   const size = resolveSize(sizeProp, "ProgressBar");
+  // Deprecated alias (decision 0024): `variant` keeps working, warns once, and
+  // loses to `tone` when both are passed.
+  if (variant !== undefined) warnDeprecated("ProgressBar", "variant", "tone");
+  const tone: ProgressBarTone = toneProp ?? variant ?? "primary";
   const labelId = useId();
   const indeterminate = value == null || Number.isNaN(value);
   const safeMax = max > 0 ? max : 100;
@@ -156,6 +176,7 @@ export function ProgressBar({
         aria-valuenow={indeterminate ? undefined : clamped}
         aria-valuetext={indeterminate ? undefined : `${percent}%`}
         data-state={indeterminate ? "indeterminate" : clamped >= safeMax ? "complete" : "loading"}
+        data-tone={tone}
         className="bg-[var(--border-default)] p-px"
       >
         <div
@@ -168,7 +189,7 @@ export function ProgressBar({
               data-filled={isOn(i) || undefined}
               className={cn(
                 "h-full flex-1",
-                isOn(i) ? FILL[variant] : "bg-[var(--surface-muted)]",
+                isOn(i) ? FILL[tone] : "bg-[var(--surface-muted)]",
                 indeterminate && reducedMotion && "opacity-50"
               )}
             />

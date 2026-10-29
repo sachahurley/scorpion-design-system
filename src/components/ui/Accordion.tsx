@@ -15,7 +15,8 @@
  *
  * - type="single": one item open at a time. Add `collapsible` to let the
  *   open item close again; without it, the open trigger is aria-disabled.
- * - type="multiple": any number open; value is a string array.
+ * - type="multiple": any number open; value is a string array. `collapsible`
+ *   has no effect here: every item can always close.
  * - Controlled via `value` + `onValueChange`, or uncontrolled via `defaultValue`.
  *
  * ACCESSIBILITY (WAI-ARIA accordion pattern): each trigger is a button
@@ -68,7 +69,10 @@ export interface AccordionSingleProps extends AccordionBaseProps {
   defaultValue?: string;
   /** Called with the open item's value (`""` when all are closed). */
   onValueChange?: (value: string) => void;
-  /** Allow closing the open item so none are open (default false). */
+  /**
+   * Allow closing the open item so none are open (default false). Without it, the
+   * open item's trigger is `aria-disabled` and one item always stays open.
+   */
   collapsible?: boolean;
 }
 
@@ -81,7 +85,11 @@ export interface AccordionMultipleProps extends AccordionBaseProps {
   defaultValue?: string[];
   /** Called with the open item values. */
   onValueChange?: (value: string[]) => void;
-  /** Always true for multiple; accepted for API symmetry. */
+  /**
+   * Has no effect with `type="multiple"`: every item can always close, so the
+   * accordion behaves as collapsible whatever you pass. Accepted only so a
+   * `type` switch does not have to drop the prop.
+   */
   collapsible?: boolean;
 }
 

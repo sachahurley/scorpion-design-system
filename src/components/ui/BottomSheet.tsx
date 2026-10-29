@@ -27,17 +27,33 @@
  * - touch.target (44px close button)
  */
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { TuiIcon } from "./TuiIcon";
 import { useFocusTrap } from "@/lib/use-focus-trap";
+import { useControllableState } from "@/lib/use-controllable-state";
+import { warnDeprecated } from "@/lib/deprecate";
 
-export interface BottomSheetProps {
-  /** Controls whether the sheet is visible. */
-  isOpen: boolean;
-  /** Called when the user dismisses the sheet (close button, scrim click or ESC). */
-  onClose: () => void;
-  /** Accessible name for the sheet dialog. */
-  ariaLabel: string;
+interface BottomSheetBaseProps {
+  /**
+   * Whether the sheet is shown. Pass it with `onOpenChange` to control the
+   * sheet: set it true to open, and false when `onOpenChange(false)` fires.
+   * Omit it (and use `defaultOpen`) for a sheet that manages its own state.
+   */
+  open?: boolean;
+  /**
+   * Initial open state when `open` is not passed (default false). The sheet
+   * then closes itself on Escape, the scrim or the close button.
+   */
+  defaultOpen?: boolean;
+  /**
+   * Called with `false` when the user dismisses the sheet (close button, scrim
+   * click or Escape). Set `open` to false here when the sheet is controlled.
+   */
+  onOpenChange?: (open: boolean) => void;
+  /** @deprecated Use `open`. Still honoured when `open` is not passed. */
+  isOpen?: boolean;
+  /** @deprecated Use `onOpenChange`. Still called whenever `onOpenChange(false)` is. */
+  onClose?: () => void;
   /**
    * Accessible name for the close button. Override it when several sheets can
    * be announced in the same view and "Close" alone would be ambiguous.
@@ -47,16 +63,66 @@ export interface BottomSheetProps {
   children: ReactNode;
 }
 
+/** Names the sheet with `aria-label` (the current prop). */
+interface BottomSheetNamedProps extends BottomSheetBaseProps {
+  /** Accessible name announced for the sheet dialog, e.g. "Site menu". Required. */
+  "aria-label": string;
+  /** @deprecated Use `aria-label`. Ignored when `aria-label` is passed. */
+  ariaLabel?: string;
+}
+
+/** Names the sheet with the deprecated `ariaLabel`, so existing callers still type-check. */
+interface BottomSheetLegacyNamedProps extends BottomSheetBaseProps {
+  /** Accessible name announced for the sheet dialog, e.g. "Site menu". Required. */
+  "aria-label"?: string;
+  /** @deprecated Use `aria-label`. Ignored when `aria-label` is passed. */
+  ariaLabel: string;
+}
+
+/**
+ * Props for `BottomSheet`. An accessible name is required: pass `aria-label`
+ * (or, deprecated, `ariaLabel`).
+ */
+export type BottomSheetProps = BottomSheetNamedProps | BottomSheetLegacyNamedProps;
+
 /**
  * A modal panel that slides up from the bottom edge, for short tasks and option lists on narrow screens.
  *
- * @param isOpen - Whether the sheet is currently visible
- * @param onClose - Callback when the user dismisses (close button, scrim click or ESC)
- * @param ariaLabel - Accessible name announced for the dialog
- * @param closeLabel - Accessible name for the close button (default "Close")
- * @param children - Sheet content
+ * @example
+ * <BottomSheet open={open} onOpenChange={setOpen} aria-label="Site menu">
+ *   <nav>...</nav>
+ * </BottomSheet>
  */
-export function BottomSheet({ isOpen, onClose, ariaLabel, closeLabel = "Close", children }: BottomSheetProps) {
+export function BottomSheet({
+  open: openProp,
+  defaultOpen = false,
+  onOpenChange,
+  isOpen: isOpenProp,
+  onClose,
+  "aria-label": ariaLabelProp,
+  ariaLabel: legacyAriaLabel,
+  closeLabel = "Close",
+  children,
+}: BottomSheetProps) {
+  if (isOpenProp !== undefined) warnDeprecated("BottomSheet", "isOpen", "open");
+  if (onClose !== undefined) warnDeprecated("BottomSheet", "onClose", "onOpenChange");
+  if (legacyAriaLabel !== undefined) warnDeprecated("BottomSheet", "ariaLabel", "aria-label");
+  const ariaLabel = ariaLabelProp ?? legacyAriaLabel;
+
+  // `open` wins over the deprecated `isOpen`; passing either makes the sheet controlled.
+  const [isOpen, setOpenState] = useControllableState({
+    value: openProp ?? isOpenProp,
+    defaultValue: defaultOpen,
+    onChange: onOpenChange,
+  });
+  // Every dismissal path (close button, Escape, scrim) lands here, so the
+  // deprecated `onClose` fires exactly when `onOpenChange(false)` does.
+  const requestClose = useCallback(() => {
+    if (!isOpen) return;
+    setOpenState(false);
+    onClose?.();
+  }, [isOpen, setOpenState, onClose]);
+
   // Stay mounted while the exit animation plays; unmount on animationend so the
   // timing always matches the CSS duration token (no JS timer to drift).
   const [visible, setVisible] = useState(isOpen);
@@ -90,11 +156,11 @@ export function BottomSheet({ isOpen, onClose, ariaLabel, closeLabel = "Close", 
   useEffect(() => {
     if (!isOpen) return;
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") requestClose();
     };
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
-  }, [isOpen, onClose]);
+  }, [isOpen, requestClose]);
 
   // Lock body scroll while open
   useEffect(() => {
@@ -115,7 +181,7 @@ export function BottomSheet({ isOpen, onClose, ariaLabel, closeLabel = "Close", 
           closing ? "animate-out fade-out fill-mode-forwards" : "animate-in fade-in"
         }`}
         style={{ zIndex: "var(--z-index-overlay)", animationDuration: "var(--duration-slow)" }}
-        onClick={onClose}
+        onClick={requestClose}
         aria-hidden="true"
       />
 
@@ -148,7 +214,7 @@ export function BottomSheet({ isOpen, onClose, ariaLabel, closeLabel = "Close", 
             <div className="w-9 h-1 bg-[var(--surface-container-stroke)]" aria-hidden="true" />
             <button
               type="button"
-              onClick={onClose}
+              onClick={requestClose}
               aria-label={closeLabel}
               className="absolute right-0 top-0 inline-flex h-touch w-touch items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors [transition-duration:var(--duration-fast)] focus:outline-none focus-visible:[box-shadow:inset_0_0_0_var(--focus-ring-width)_var(--focus-ring-primary)]"
             >

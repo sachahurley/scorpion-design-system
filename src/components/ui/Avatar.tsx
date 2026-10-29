@@ -19,21 +19,29 @@
  * - Status indicator (online/offline dot)
  * - Fallback to initials if image fails to load
  * - Full light/dark theme support
- * - Accessible (alt text support)
+ * - Always named: `alt` is required and names the image or, for initials and
+ *   icons, the box (`role="img"`); `alt=""` marks a decorative avatar
  */
 
 import { useState, type ReactNode } from "react";
 import { resolveSize, type ControlSizeProp } from "@/lib/size";
+import { renderIconSlot, type IconSlot } from "@/lib/icon-slot";
 
 export interface AvatarProps {
   /** Image URL. Shown when set and it loads; otherwise the avatar falls back to `initials`, then `icon`, then an `@` glyph. */
   src?: string;
-  /** Alt text for the image, usually the person's name. Defaults to "Avatar", so pass it whenever `src` is set. */
-  alt?: string;
+  /**
+   * Who the avatar shows, usually the person's name. Required, because it names
+   * the avatar whatever it renders: the image's alt text, and the name of the
+   * initials or icon fallback (which is also what a broken image falls back to).
+   * Pass `""` when the name is already written next to the avatar, so it is
+   * hidden from assistive tech instead of being read twice.
+   */
+  alt: string;
   /** One or two letters shown when there is no image, or the image fails to load. */
   initials?: string;
-  /** Icon shown when there is neither an image nor initials (for a team, a bot, a system account). */
-  icon?: ReactNode;
+  /** Icon shown when there is neither an image nor initials (for a team, a bot, a system account). Takes a TuiIcon name (`"Check"`) or an element. */
+  icon?: IconSlot | ReactNode;
   /** Diameter: sm 24px, md 40px (default), lg 64px, xl 96px. Legacy names are deprecated aliases. */
   size?: ControlSizeProp | "xl";
   /** Presence dot in the corner, announced as "Status: online" and so on. Omit it to show no dot. */
@@ -109,6 +117,20 @@ export function Avatar({
   const showIcon = !showImage && !showInitials && icon;
   const showDefaultIcon = !showImage && !showInitials && !showIcon;
 
+  // NAME: an image is named by its alt. The initials and icon fallbacks are
+  // drawn text, not an image, so the box itself becomes the image and carries
+  // the name; its content would otherwise be read as stray letters. `alt=""`
+  // marks a decorative avatar (the name is printed beside it). An untyped
+  // caller that omits `alt` keeps the old behaviour: the image reads "Avatar"
+  // and the fallback is unnamed.
+  const decorative = alt === "";
+  const fallbackName =
+    showImage || alt === undefined
+      ? {}
+      : decorative
+        ? { "aria-hidden": true as const }
+        : { role: "img", "aria-label": alt };
+
   // STATUS INDICATOR COLORS
   const statusColors = {
     online: "bg-success-600 dark:bg-success-500",
@@ -120,6 +142,7 @@ export function Avatar({
     <div className={`relative inline-block ${currentSize.container} ${className}`}>
       {/* Avatar Container */}
       <div
+        {...fallbackName}
         className={`
           ${currentSize.container}
           plate-round
@@ -135,7 +158,7 @@ export function Avatar({
         {showImage && (
           <img
             src={src}
-            alt={alt || "Avatar"}
+            alt={alt ?? "Avatar"}
             className="w-full h-full object-cover"
             onError={handleImageError}
           />
@@ -150,7 +173,7 @@ export function Avatar({
             sized div leaves glyph icons sitting off-position) */}
         {showIcon && (
           <div className={`${currentSize.icon} inline-flex items-center justify-center leading-none text-secondary-700 dark:text-secondary-300`}>
-            {icon}
+            {renderIconSlot(icon)}
           </div>
         )}
 

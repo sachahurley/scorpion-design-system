@@ -17,17 +17,22 @@
  */
 
 import { type ReactNode } from "react";
+import { warnDeprecated } from "@/lib/deprecate";
 
 /** How the card distributes its sections vertically. */
 export type CardLayout = "block" | "flex";
 
 export interface CardProps {
   // Header content
-  /** Card title, rendered as the header heading. */
+  /** Card title, rendered as the header heading (an `h3`). Ignored when `headerContent` is set. */
   title?: string;
-  /** Supporting line under the title. */
+  /** Supporting line under the title. Ignored when `headerContent` is set. */
   subtitle?: string;
-  /** Custom header node; replaces `title` / `subtitle` when set. */
+  /**
+   * Custom header node, for a header that needs more than a title and subtitle
+   * (a badge, an action). Wins over `title` and `subtitle`: when it is set they
+   * are not rendered, so put any heading you need inside it.
+   */
   headerContent?: ReactNode;
 
   // Main content
@@ -43,7 +48,9 @@ export interface CardProps {
    * Section layout. `block` (default) lets the card grow with its content.
    * `flex` makes the card a flex column whose content section fills the
    * remaining height, so a fixed-height card can pin its footer to the
-   * bottom. Prefer this over the legacy `className` sniff below.
+   * bottom. Pass it explicitly: when it is omitted, a standalone `flex` class in
+   * `className` still switches the card to `flex` (legacy behaviour), and that
+   * inference logs a one-time development warning asking for `layout="flex"`.
    */
   layout?: CardLayout;
   /** Additional CSS classes (width, height, margin). */
@@ -58,7 +65,7 @@ const BARE_FLEX_CLASS = /(?:^|\s)flex(?:\s|$)/;
  *
  * @param title - Card title (shown in header)
  * @param subtitle - Card subtitle/description (shown below title)
- * @param headerContent - Custom header content (overrides title/subtitle if provided)
+ * @param headerContent - Custom header content (wins over title/subtitle: they are not rendered when it is set)
  * @param children - Main card content
  * @param footerContent - Footer content (buttons, links, etc.)
  * @param layout - "block" (default) or "flex" (content section fills the height)
@@ -78,7 +85,9 @@ export function Card({
   // `flex` class: the old `className.includes('flex')` test also fired on
   // `inline-flex`, `flex-1` and `flex-wrap`, silently turning plain cards into
   // flex columns. Pass `layout="flex"` in new code.
-  const isFlexLayout = layout ? layout === "flex" : BARE_FLEX_CLASS.test(className);
+  const inferredFlex = !layout && BARE_FLEX_CLASS.test(className);
+  if (inferredFlex) warnDeprecated("Card", 'inferring layout from a `flex` class in className', 'layout="flex"');
+  const isFlexLayout = layout ? layout === "flex" : inferredFlex;
 
   // PLATE RING RECIPE — outer layer is the stroke clipped to the large plate,
   // inner layer is the card fill clipped 1px inset. Note: the clip bounds any

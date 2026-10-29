@@ -68,7 +68,10 @@ export type LinkProps = CommonProps &
          * styling so client-side navigation works without a full page load.
          */
         as: ElementType;
-        /** Props for the `as` component (`to`, `state`, ...), spread onto it as-is. */
+        /**
+         * Props for the `as` component (`to`, `state`, ...), spread onto it as-is and
+         * winning over the `external` new-tab defaults. They are spread untyped: TypeScript does not check them against the `as` component's own props, so a misspelt `to` is not caught at compile time.
+         */
         asProps?: Record<string, unknown>;
         href?: never;
       }

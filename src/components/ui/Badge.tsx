@@ -4,8 +4,8 @@
  * Reusable badge/tag component for labels, status indicators, and counts
  * Built entirely from design tokens defined in tokens.json
  * 
- * VARIANTS:
- * - default: Neutral gray badge
+ * TONES (decision 0024's colour roles, plus Badge's own primary and bone):
+ * - neutral: Neutral gray badge
  * - primary: Amber/primary brand color
  * - success: Green for positive states
  * - warning: Purple for warnings
@@ -14,6 +14,7 @@
  * - bone: filled sepia-500 chip, identical in both themes — the
  *   tier-neutral state marker for surfaces that must not ride the accent
  *   or re-theme (the portfolio's equipped/loot chips)
+ * The deprecated `variant` prop still works; its `default` maps to `neutral`.
  * 
  * SIZES:
  * - sm: Compact badge (20px height)
@@ -21,13 +22,13 @@
  * - lg: Larger badge (28px height)
  * 
  * FEATURES:
- * - Optional close button (onClose prop)
+ * - Optional remove button (onDismiss prop, named by dismissLabel)
  * - Icon support (iconLeft prop)
  * - caps: uppercase eyebrow voice (uppercase + .08em tracking) for state
  *   chips ("EQUIPPED", "LEVEL UP") without per-site className overrides
  * - dashed: the not-yet-real voice — transparent fill with a dashed
  *   hairline for placeholders, empty slots, and free tiers ("FREE").
- *   Composes with any variant; the dash rides the variant's text color,
+ *   Composes with any tone; the dash rides the tone's text color,
  *   except bone whose dash stays theme-stable sepia-500.
  * - Full light/dark theme support
  */
@@ -35,9 +36,22 @@
 import { type ReactNode } from "react";
 import { TuiIcon } from "./TuiIcon";
 import { resolveSize, type ControlSizeProp } from "@/lib/size";
+import { warnDeprecated } from "@/lib/deprecate";
+import { renderIconSlot, type IconSlot } from "@/lib/icon-slot";
+
+/**
+ * Colour role of a Badge: the five semantic roles plus Badge's own `primary`
+ * (the brand accent) and `bone` (a fixed tint that never follows the theme).
+ */
+export type BadgeTone = "neutral" | "info" | "success" | "warning" | "error" | "primary" | "bone";
 
 export interface BadgeProps {
-  /** Colour role. Pair a semantic role with text that says the same thing, since colour alone is not enough; `bone` is a fixed tint that never follows the theme. Default: "default". */
+  /** Colour role. Pair a semantic role with text that says the same thing, since colour alone is not enough; `bone` is a fixed tint that never follows the theme. Default: "neutral". */
+  tone?: BadgeTone;
+  /**
+   * Colour role under its old name; `default` maps to `neutral`. When both are set, `tone` wins.
+   * @deprecated Use `tone`.
+   */
   variant?: "default" | "primary" | "success" | "warning" | "error" | "info" | "bone";
   /** Badge height: sm 20px, md 24px (default), lg 28px. Legacy names are deprecated aliases. */
   size?: ControlSizeProp;
@@ -45,16 +59,21 @@ export interface BadgeProps {
   caps?: boolean;
   /**
    * Not-yet-real voice: transparent fill with a 1px dashed border in the
-   * variant's text color, for placeholders, empty slots, and free tiers.
+   * tone's text color, for placeholders, empty slots, and free tiers.
    * Dashed chips drop the plate clip for sharp corners (the notched clip
    * would slice the dashes).
    */
   dashed?: boolean;
   /** The label: a word, a short phrase or a number. Keep it to one line. */
   children: ReactNode;
-  /** Icon before the label, usually a `TuiIcon`, to reinforce the meaning of a status badge. */
-  iconLeft?: ReactNode;
+  /** Icon before the label, to reinforce the meaning of a status badge. Takes a TuiIcon name (`"Check"`) or an element. */
+  iconLeft?: IconSlot | ReactNode;
   /** Adds a remove (x) button that calls this when pressed. Use it for filter chips and tags the user can clear. */
+  onDismiss?: () => void;
+  /**
+   * Remove callback under its old name. When both are set, `onDismiss` wins.
+   * @deprecated Use `onDismiss`.
+   */
   onClose?: () => void;
   /**
    * Accessible name for the remove button. Defaults to `Remove {children}`
@@ -62,30 +81,46 @@ export interface BadgeProps {
    * "Remove Draft", "Remove Archived"), and to "Remove badge" otherwise. Pass
    * it explicitly whenever the label alone does not identify what is removed.
    */
+  dismissLabel?: string;
+  /**
+   * Remove button name under its old name. When both are set, `dismissLabel` wins.
+   * @deprecated Use `dismissLabel`.
+   */
   onCloseLabel?: string;
   /** Extra classes on the badge (margin, alignment). */
   className?: string;
 }
 
 /**
- * A short status, category or count label set beside other content; with `onClose` it becomes a removable chip (a filter, a tag).
+ * A short status, category or count label set beside other content; with `onDismiss` it becomes a removable chip (a filter, a tag).
  */
 export function Badge({
-  variant = "default",
+  tone: toneProp,
+  variant,
   size: sizeProp = "md",
   caps = false,
   dashed = false,
   children,
   iconLeft,
+  onDismiss: onDismissProp,
   onClose,
+  dismissLabel,
   onCloseLabel,
   className = "",
 }: BadgeProps) {
-    const size = resolveSize(sizeProp, "Badge");
+  const size = resolveSize(sizeProp, "Badge");
+  // Deprecated aliases (decision 0024): the old names keep working, warn once,
+  // and lose to the new names when both are passed.
+  if (variant !== undefined) warnDeprecated("Badge", "variant", "tone");
+  if (onClose !== undefined) warnDeprecated("Badge", "onClose", "onDismiss");
+  if (onCloseLabel !== undefined) warnDeprecated("Badge", "onCloseLabel", "dismissLabel");
+  const tone: BadgeTone = toneProp ?? (variant === "default" ? "neutral" : variant) ?? "neutral";
+  const onDismiss = onDismissProp ?? onClose;
   // Name the remove button after the chip it removes when the label is plain
   // text; a caller can always override, and rich children fall back to the
   // generic name.
-  const removeLabel = onCloseLabel ?? (typeof children === "string" ? `Remove ${children}` : "Remove badge");
+  const removeLabel =
+    dismissLabel ?? onCloseLabel ?? (typeof children === "string" ? `Remove ${children}` : "Remove badge");
   // SIZE STYLES - Heights and padding matching design system
   // Small: 20px height, 8px horizontal padding, 4px vertical padding
   // Medium: 24px height, 10px horizontal padding, 4px vertical padding
@@ -99,8 +134,8 @@ export function Badge({
   // Plate badges — compact filled plates sharing the button silhouette.
   // Tints follow the Alert fills (50 on light, 950 on dark); text scales
   // stay at 800/300 which meet WCAG AA on those fills.
-  const variantStyles = {
-    default: `
+  const toneStyles: Record<BadgeTone, string> = {
+    neutral: `
       bg-[var(--surface-muted)]
       text-secondary-800 dark:text-secondary-200
     `,
@@ -132,14 +167,14 @@ export function Badge({
     `,
   };
 
-  // DASHED VARIANTS — no fill, so only the text scales remain (they meet AA
+  // DASHED TONES: no fill, so only the text scales remain (they meet AA
   // on page surfaces just as they do on the tinted fills). The border rides
-  // border-current so each variant's dash matches its text. Bone is the
+  // border-current so each tone's dash matches its text. Bone is the
   // exception: the DASH stays theme-stable sepia-500 (the empty-slot
   // counterpart to the filled bone chip) but the text keeps the per-theme
   // scales — sepia-500 text fails AA on the light page.
-  const dashedVariantStyles = {
-    default: "border-current text-secondary-800 dark:text-secondary-200",
+  const dashedToneStyles: Record<BadgeTone, string> = {
+    neutral: "border-current text-secondary-800 dark:text-secondary-200",
     primary: "border-current text-primary-800 dark:text-primary-300",
     success: "border-current text-success-800 dark:text-success-300",
     warning: "border-current text-warning-800 dark:text-warning-300",
@@ -162,8 +197,8 @@ export function Badge({
         font-mono font-medium
         ${
           dashed
-            ? `rounded-none border border-dashed bg-transparent ${dashedVariantStyles[variant]}`
-            : `plate-round ${variantStyles[variant]}`
+            ? `rounded-none border border-dashed bg-transparent ${dashedToneStyles[tone]}`
+            : `plate-round ${toneStyles[tone]}`
         }
         ${sizeStyles[size]}
         ${caps ? "uppercase [letter-spacing:.08em]" : ""}
@@ -173,7 +208,7 @@ export function Badge({
       {/* Left Icon */}
       {iconLeft && (
         <span className={`inline-flex items-center justify-center ${iconSizes[size]} flex-shrink-0`}>
-          {iconLeft}
+          {renderIconSlot(iconLeft)}
         </span>
       )}
       
@@ -187,12 +222,12 @@ export function Badge({
           the effective target is the full chip height by 44px wide; give
           removable chips room in their row rather than packing them edge to
           edge. */}
-      {onClose && (
+      {onDismiss && (
         <button
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            onClose();
+            onDismiss();
           }}
           className={`
             relative inline-flex items-center justify-center

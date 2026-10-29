@@ -38,10 +38,10 @@ export function LightModeNotice() {
 
   return (
     <Modal
-      isOpen={isOpen}
-      onClose={() => setIsOpen(false)}
+      open={isOpen}
+      onOpenChange={setIsOpen}
       title="Under construction"
-      width={360}
+      size="sm"
       footerContent={
         <Button variant="primary" size="medium" onClick={() => setIsOpen(false)}>
           Got it

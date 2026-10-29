@@ -38,11 +38,18 @@ export interface RadioProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   size?: ControlSizeProp;
   /** Visible label next to the box; clicking it selects the radio. Without one, pass `aria-label`. */
   label?: string | ReactNode;
-  /** Error styling without a message. Prefer `errorMessage` so users learn what to fix. */
+  /**
+   * Error styling without a message. Prefer `errorMessage` so users learn what to fix.
+   * Styling only: announce the invalid state with `aria-invalid` on the group
+   * (`<fieldset role="radiogroup">`), since ARIA does not support it on a radio.
+   */
   error?: boolean;
   /** Secondary line under the label (explains what picking this option means). */
   helperText?: ReactNode;
-  /** Validation message under the label. Sets the error state and replaces `helperText`. */
+  /**
+   * Validation message under the label, read through `aria-describedby`. Sets the
+   * error styling and replaces `helperText`. Put `aria-invalid` on the group, not here.
+   */
   errorMessage?: ReactNode;
   /**
    * Called with this radio's checked state after a change (alternative to
@@ -87,7 +94,8 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(
   ) => {
     const size = resolveSize(sizeProp, "Radio");
     // Helper and error text share the Checkbox / Input plumbing: one place
-    // owns the message id, `aria-describedby` and `aria-invalid`.
+    // owns the message id and `aria-describedby`. The radio uses `invalid`
+    // for styling only; see the input below for where aria-invalid goes.
     const field = useFieldMessage({ error: errorProp, helperText, errorMessage, describedBy: ariaDescribedBy });
     const error = field.invalid;
     // Size styles proportional to button/input system
@@ -155,7 +163,10 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(
     // box. It sits inside the <label>, so a tap anywhere in it selects.
     const control = (
       <span className="relative inline-flex shrink-0 before:content-[''] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-touch before:h-touch">
-        {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props -- known gap: ARIA 1.2 puts aria-invalid on the radiogroup, see docs/specs/Radio.md */}
+        {/* No aria-invalid here: ARIA 1.2 does not support it on role radio.
+            The invalid state belongs on the group the caller renders
+            (`<fieldset role="radiogroup" aria-invalid>`); this radio's own
+            message is still read through aria-describedby. */}
         <input
           ref={ref}
           type="radio"
@@ -163,7 +174,6 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(
           disabled={disabled}
           onChange={handleChange}
           className="peer sr-only"
-          aria-invalid={error || undefined}
           aria-describedby={field.describedBy}
           {...props}
         />
