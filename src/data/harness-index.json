@@ -12,11 +12,11 @@
     "baselines": "https://github.com/sachahurley/scorp-ds/tree/main/packages/storybook/visual-baselines"
   },
   "counts": {
-    "components": 44,
+    "components": 48,
     "primitives": 7,
     "specs": 65,
-    "stories": 73,
-    "baselines": 590,
+    "stories": 78,
+    "baselines": 656,
     "lintRules": 17,
     "skills": 19,
     "decisions": 32,
