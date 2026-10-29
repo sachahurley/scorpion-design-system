@@ -14,12 +14,12 @@
   "counts": {
     "components": 43,
     "primitives": 7,
-    "specs": 61,
+    "specs": 64,
     "stories": 72,
-    "baselines": 554,
+    "baselines": 562,
     "lintRules": 17,
     "skills": 19,
-    "decisions": 27,
+    "decisions": 30,
     "insights": 6,
     "tokens": 427
   },
@@ -210,7 +210,8 @@
         "Unit tests",
         "API surface manifest is current",
         "Specs match the components they describe",
-        "Component catalog is current"
+        "Component catalog is current",
+        "Token tables in design-tokens.md are current"
       ],
       "url": "https://github.com/sachahurley/scorp-ds/blob/main/.github/workflows/ci.yml"
     },
@@ -452,6 +453,24 @@
       "title": "Half-step spacing gets tokens; off-scale steps are errors",
       "affects": "global.spacing, the preset",
       "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0027-half-step-spacing-is-tokenised.md"
+    },
+    {
+      "id": "0028",
+      "title": "Composition rules are written down, and every pattern is a preset",
+      "affects": "composition-presets-guidelines.md, presets/, pattern specs",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0028-composition-rules-are-written-down.md"
+    },
+    {
+      "id": "0029",
+      "title": "An interactive component's accessible name is required by its type",
+      "affects": "Switch, Slider, TreeView, TabsList, Avatar, Popover, BottomSheet",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0029-accessible-names-are-required-by-type.md"
+    },
+    {
+      "id": "0030",
+      "title": "Every state a component's API supports has a story",
+      "affects": "Stories, doc requirements",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/decisions/0030-every-data-state-has-a-story.md"
     }
   ],
   "insights": [

@@ -373,7 +373,7 @@ const LOG_LINES = [
   { id: 5, timestamp: "12:04:07", level: "error" as const, text: "  Bare value in 'w-[18px]'. Route it through a token, or allowlist it with a reason." },
   { id: 6, timestamp: "12:04:08", level: "error" as const, text: "2 problems, 0 warnings" },
   { id: 7, timestamp: "12:04:08", level: "info" as const, text: "type-check, unit tests and api manifest not reached" },
-  { id: 8, timestamp: "12:04:08", level: "warn" as const, text: "CI failed in 1m 04s. Storybook a11y and Visual regression still running." },
+  { id: 8, timestamp: "12:04:08", level: "warning" as const, text: "CI failed in 1m 04s. Storybook a11y and Visual regression still running." },
 ];
 
 const SLOTS: CaseStudySlots = {

@@ -10,7 +10,7 @@
  * - Customizable trigger (any React element)
  * - Icon support for menu items
  * - Destructive action styling
- * - Left or right alignment
+ * - Start or end alignment (`align`; `left` / `right` are deprecated aliases)
  *
  * Every button here is `type="button"`, so a Dropdown inside a `<form>`
  * opens the menu instead of submitting the form.
@@ -19,6 +19,8 @@
 import { useState, useRef, useEffect, cloneElement, isValidElement, type MouseEvent as ReactMouseEvent, type ReactElement, type ReactNode } from "react";
 import { TuiIcon } from "./TuiIcon";
 import { resolveSize, type ControlSizeProp } from "@/lib/size";
+import { warnDeprecated } from "@/lib/deprecate";
+import { renderIconSlot, type IconSlot } from "@/lib/icon-slot";
 
 // Menu item interface
 export interface DropdownItem {
@@ -26,15 +28,20 @@ export interface DropdownItem {
   label: string;
   /** Called on activation; the menu then closes. */
   onClick: () => void;
-  /** Left icon grouped with the label (use a `TuiIcon`). */
-  icon?: ReactNode;
-  /** Right-aligned icon, for a shortcut hint or an external-link marker. */
-  iconRight?: ReactNode;
+  /** Left icon grouped with the label. Takes a TuiIcon name (`"Check"`) or an element. */
+  icon?: IconSlot | ReactNode;
+  /** Right-aligned icon, for a shortcut hint or an external-link marker. Takes a TuiIcon name (`"Check"`) or an element. */
+  iconRight?: IconSlot | ReactNode;
   /** `destructive` colors the item red for irreversible actions. */
   variant?: "default" | "destructive";
   /** Dims the item, blocks activation, and skips it during arrow-key navigation. */
   disabled?: boolean;
 }
+
+/** @deprecated Use `start` (for `left`) or `end` (for `right`). */
+type DeprecatedDropdownAlign = "left" | "right";
+
+const LEGACY_ALIGN: Record<DeprecatedDropdownAlign, "start" | "end"> = { left: "start", right: "end" };
 
 // Dropdown component props
 export interface DropdownProps {
@@ -49,8 +56,12 @@ export interface DropdownProps {
   trigger?: ReactNode;
   /** Menu entries, in order. */
   items: DropdownItem[];
-  /** Which trigger edge the menu aligns to. Use `right` near the viewport edge. */
-  align?: "left" | "right";
+  /**
+   * Which trigger edge the menu lines up with (default "start", the leading
+   * edge). Use `end` for a trigger at the trailing edge of a row or header, so
+   * the menu opens inward. `left` and `right` are deprecated aliases.
+   */
+  align?: "start" | "end" | DeprecatedDropdownAlign;
   /** Text (and accessible name) of the default trigger button. Ignored with a custom `trigger`. */
   label?: string;
   /** Trigger height, matching Button/Input: sm, md (default), lg. Legacy names are deprecated aliases. */
@@ -80,18 +91,25 @@ function nextEnabledIndex(items: DropdownItem[], from: number, delta: 1 | -1): n
  *
  * @param trigger - Custom trigger element (optional, defaults to button)
  * @param items - Array of menu items with labels, onClick handlers, and optional icons
- * @param align - Menu alignment: "left" or "right" (default: "left")
+ * @param align - Menu alignment: "start" or "end" (default: "start")
  * @param label - Label text for default trigger button (default: "Actions")
  * @param size - Default trigger height and item icon size (default: "md")
  */
-export function Dropdown({ 
-  trigger, 
-  items, 
-  align = "left",
+export function Dropdown({
+  trigger,
+  items,
+  align: alignProp = "start",
   label = "Actions",
   size: sizeProp = "md"
 }: DropdownProps) {
     const size = resolveSize(sizeProp, "Dropdown");
+  let align: "start" | "end";
+  if (alignProp === "left" || alignProp === "right") {
+    warnDeprecated("Dropdown", `align="${alignProp}"`, `align="${LEGACY_ALIGN[alignProp]}"`);
+    align = LEGACY_ALIGN[alignProp];
+  } else {
+    align = alignProp;
+  }
   const [isOpen, setIsOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -301,7 +319,7 @@ export function Dropdown({
           style={{ animationDuration: "var(--duration-normal)" }}
           className={`
             absolute top-full mt-2
-            ${align === "right" ? "right-0" : "left-0"}
+            ${align === "end" ? "end-0" : "start-0"}
             min-w-52
             plate-round p-px bg-[var(--border-default)]
             z-[var(--z-index-dropdown)]
@@ -346,7 +364,7 @@ export function Dropdown({
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                   {item.icon && (
                     <span className={`inline-flex items-center justify-center ${currentSizeStyles.icon} flex-shrink-0`}>
-                      {item.icon}
+                      {renderIconSlot(item.icon)}
                     </span>
                   )}
                   <span className="truncate">{item.label}</span>
@@ -355,7 +373,7 @@ export function Dropdown({
                 {/* Right icon aligned to right edge */}
                 {item.iconRight && (
                   <span className={`inline-flex items-center justify-center ${currentSizeStyles.icon} flex-shrink-0 ml-auto`}>
-                    {item.iconRight}
+                    {renderIconSlot(item.iconRight)}
                   </span>
                 )}
               </button>

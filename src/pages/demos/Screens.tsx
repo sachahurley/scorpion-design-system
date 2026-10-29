@@ -102,7 +102,7 @@ function SignInView() {
         }
       >
         <div className="flex items-center gap-3">
-          <Badge variant="success">Active session</Badge>
+          <Badge tone="success">Active session</Badge>
           <span className="text-sm font-mono text-secondary-800 dark:text-secondary-500">
             {email}
           </span>
@@ -286,9 +286,9 @@ function ProfileView() {
             Designer & Builder
           </p>
           <div className="flex flex-wrap gap-2">
-            <Badge variant="primary">Design systems</Badge>
-            <Badge variant="info">TUI</Badge>
-            <Badge variant="default" dashed>
+            <Badge tone="primary">Design systems</Badge>
+            <Badge tone="info">TUI</Badge>
+            <Badge tone="neutral" dashed>
               More soon
             </Badge>
           </div>

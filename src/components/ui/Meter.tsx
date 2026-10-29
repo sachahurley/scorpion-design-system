@@ -11,14 +11,16 @@
  * - value in the optimum's region: `success`
  * - one region away: `warning`
  * - two regions away (optimum low, value high, or the reverse): `error`
- * With no thresholds the meter stays `primary`. Pass `tone` to override.
+ * With no thresholds the meter stays `primary`. Pass `tone` to override:
+ * it takes decision 0024's five roles (neutral, info, success, warning,
+ * error) plus Meter's own `primary`.
  *
  * COLOR IS NEVER THE ONLY SIGNAL: the label and the value text are always
  * visible, and warning / error states add a 1-bit icon.
  *
  * TOKENS USED:
- * - success / warning / error / primary semantic scales (filled blocks:
- *   600 on light, 400 on dark)
+ * - primary / neutral (secondary) / info / success / warning / error
+ *   semantic scales (filled blocks: 600 on light, 400 on dark)
  * - surface.muted (empty blocks), surface.container-stroke (block ring)
  * - text.primary (label), text.secondary (value text)
  */
@@ -28,8 +30,11 @@ import { cn } from "@/lib/utils";
 import { resolveSize, type ControlSizeProp } from "@/lib/size";
 import { TuiIcon } from "./TuiIcon";
 
-/** Semantic tone of the filled blocks. */
-export type MeterTone = "primary" | "success" | "warning" | "error";
+/**
+ * Semantic tone of the filled blocks: the five semantic roles plus `primary`,
+ * the accent a meter shows when no thresholds are set.
+ */
+export type MeterTone = "primary" | "neutral" | "info" | "success" | "warning" | "error";
 
 export interface MeterProps {
   /** Current value. Clamped to `[min, max]`. */
@@ -84,6 +89,8 @@ export function getMeterTone({
 
 const FILL: Record<MeterTone, string> = {
   primary: "bg-primary-600 dark:bg-primary-400",
+  neutral: "bg-secondary-600 dark:bg-secondary-400",
+  info: "bg-info-600 dark:bg-info-400",
   success: "bg-success-600 dark:bg-success-400",
   warning: "bg-warning-600 dark:bg-warning-400",
   error: "bg-error-600 dark:bg-error-400",

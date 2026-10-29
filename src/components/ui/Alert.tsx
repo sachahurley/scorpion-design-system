@@ -4,18 +4,19 @@
  * Reusable alert/notification component for user feedback
  * Built entirely from design tokens defined in tokens.json
  * 
- * VARIANTS:
- * - default: Neutral gray alert
+ * TONES (decision 0024's colour roles):
+ * - neutral: Neutral gray alert
  * - success: Green for success messages
  * - warning: Purple for warnings
  * - error: Red for error messages
  * - info: Blue for informational messages
+ * The deprecated `variant` prop still works; its `default` maps to `neutral`.
  * 
  * FEATURES:
- * - Severity icon per variant from the 1-bit set: default Bell, info Info,
+ * - Severity icon per tone from the 1-bit set: neutral Bell, info Info,
  *   success CheckCircle, warning AlertTriangle, error AlertCircle
  *   (override with iconLeft)
- * - Optional close button (onClose prop), a 1-bit X. It is a `type="button"`
+ * - Optional dismiss button (onDismiss prop), a 1-bit X. It is a `type="button"`
  *   control so an Alert inside a form never submits it, carries the system's
  *   inset focus ring, and gets an invisible 44x44px hit area from a
  *   pseudo-element (same recipe as Checkbox, so the visual stays 12px).
@@ -25,19 +26,39 @@
  */
 
 import { type ReactNode } from "react";
+import { warnDeprecated } from "@/lib/deprecate";
 import { TuiIcon, type TuiIconName } from "./TuiIcon";
+import { renderIconSlot, type IconSlot } from "@/lib/icon-slot";
+
+/** Semantic colour role of an Alert: picks the colour set and the 1-bit severity icon. */
+export type AlertTone = "neutral" | "info" | "success" | "warning" | "error";
 
 export interface AlertProps {
-  /** Severity: picks the color set and the 1-bit severity icon. */
+  /** Severity: picks the colour set and the 1-bit severity icon. Default: "neutral". */
+  tone?: AlertTone;
+  /**
+   * Severity under its old name; `default` maps to `neutral`. When both are set, `tone` wins.
+   * @deprecated Use `tone`.
+   */
   variant?: "default" | "success" | "warning" | "error" | "info";
   /** Short bold headline, one line. Say what happened, not "Error". */
   title?: string;
   /** Body copy under the title: what it means and what to do next. */
   description?: ReactNode;
-  /** Replaces the variant's severity icon. Use a `TuiIcon`. */
-  iconLeft?: ReactNode;
+  /** Replaces the tone's severity icon. Takes a TuiIcon name (`"Check"`) or an element. */
+  iconLeft?: IconSlot | ReactNode;
   /** Adds a dismiss control (44px hit area) and is called when it is pressed. */
+  onDismiss?: () => void;
+  /**
+   * Dismiss callback under its old name. When both are set, `onDismiss` wins.
+   * @deprecated Use `onDismiss`.
+   */
   onClose?: () => void;
+  /**
+   * Accessible name of the dismiss button (default "Close alert"). Name what it
+   * dismisses when a page has several alerts ("Dismiss sync warning").
+   */
+  dismissLabel?: string;
   /** Extra classes on the outer ring layer (spacing and width only). */
   className?: string;
 }
@@ -45,42 +66,52 @@ export interface AlertProps {
 /**
  * An inline message about the state of a page or form that stays until the user acts, with an optional title, icon and dismiss button.
  * 
- * @param variant - Alert color variant (default: "default")
+ * @param tone - Alert colour role (default: "neutral")
  * @param title - Optional alert title
  * @param description - Optional alert description/content
- * @param iconLeft - Optional custom icon (defaults to variant icon)
- * @param onClose - Optional callback when close button is clicked
+ * @param iconLeft - Optional custom icon (defaults to the tone's icon)
+ * @param onDismiss - Optional callback when the dismiss button is clicked
  * @param className - Additional CSS classes
  */
 export function Alert({
-  variant = "default",
+  tone: toneProp,
+  variant,
   title,
   description,
   iconLeft,
+  onDismiss: onDismissProp,
   onClose,
+  dismissLabel = "Close alert",
   className = "",
 }: AlertProps) {
-  // 1-bit severity icons, one per variant (default and info differ, so the
+  // Deprecated aliases (decision 0024): the old names keep working, warn once,
+  // and lose to the new names when both are passed.
+  if (variant !== undefined) warnDeprecated("Alert", "variant", "tone");
+  if (onClose !== undefined) warnDeprecated("Alert", "onClose", "onDismiss");
+  const tone: AlertTone = toneProp ?? (variant === "default" ? "neutral" : variant) ?? "neutral";
+  const onDismiss = onDismissProp ?? onClose;
+
+  // 1-bit severity icons, one per tone (neutral and info differ, so the
   // icon, not just the color, tells them apart)
-  const severityIcons: Record<NonNullable<AlertProps["variant"]>, TuiIconName> = {
-    default: "Bell",
+  const severityIcons: Record<AlertTone, TuiIconName> = {
+    neutral: "Bell",
     success: "CheckCircle",
     warning: "AlertTriangle",
     error: "AlertCircle",
     info: "Info",
   };
 
-  // Use custom icon if provided, otherwise the variant's 1-bit icon
-  const icon = iconLeft || <TuiIcon name={severityIcons[variant]} size="4" />;
+  // Use custom icon if provided, otherwise the tone's 1-bit icon
+  const icon = renderIconSlot(iconLeft, { size: "4" }) || <TuiIcon name={severityIcons[tone]} size="4" />;
 
-  // VARIANT STYLES - Color combinations using semantic tokens
-  // All variants support light and dark themes.
+  // TONE STYLES - Color combinations using semantic tokens
+  // All tones support light and dark themes.
   // PLATE RING RECIPE: `ring` is the border color painted on the outer layer
   // (clipped to the plate), `fill` is the surface painted on the inner layer
   // 1px inset — clip-path slices real borders, so the ring is a layer.
-  const variantStyles = {
-    // Default: neutral semantic surfaces (surface + border roles)
-    default: {
+  const toneStyles: Record<AlertTone, { ring: string; fill: string; icon: string; title: string; description: string }> = {
+    // Neutral: neutral semantic surfaces (surface + border roles)
+    neutral: {
       ring: "bg-[var(--border-default)]",
       fill: "bg-[var(--surface-subtle)]",
       icon: "text-secondary-800 dark:text-secondary-300",
@@ -125,13 +156,13 @@ export function Alert({
     },
   };
 
-  const styles = variantStyles[variant];
+  const styles = toneStyles[tone];
 
   // Close control focus ring: the system's inset box-shadow ring (an outside
   // ring would be sliced by the plate clip). There is no per-severity ring
-  // token, so error takes the error ring and every other variant the primary.
+  // token, so error takes the error ring and every other tone the primary.
   const closeFocusRing =
-    variant === "error"
+    tone === "error"
       ? "focus-visible:[box-shadow:inset_0_0_0_var(--focus-ring-width)_var(--focus-ring-error)]"
       : "focus-visible:[box-shadow:inset_0_0_0_var(--focus-ring-width)_var(--focus-ring-primary)]";
 
@@ -167,12 +198,12 @@ export function Alert({
         )}
       </div>
 
-      {/* Close Button: 12px glyph, 44px hit area from a centered
+      {/* Dismiss Button: 12px glyph, 44px hit area from a centered
           pseudo-element (layout unchanged), inset token focus ring */}
-      {onClose && (
+      {onDismiss && (
         <button
           type="button"
-          onClick={onClose}
+          onClick={onDismiss}
           className={`
             relative flex-shrink-0
             font-mono text-xs font-bold
@@ -184,7 +215,7 @@ export function Alert({
             before:w-touch before:h-touch
             focus:outline-none ${closeFocusRing}
           `}
-          aria-label="Close alert"
+          aria-label={dismissLabel}
         >
           <TuiIcon name="X" size="3" />
         </button>
@@ -193,8 +224,3 @@ export function Alert({
     </div>
   );
 }
-
-
-
-
-

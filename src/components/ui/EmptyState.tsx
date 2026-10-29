@@ -22,7 +22,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "./Button";
-import { TuiIcon, type TuiIconName } from "./TuiIcon";
+import { renderIconSlot, type IconSlot } from "@/lib/icon-slot";
 
 /** A Button rendered by EmptyState. */
 export interface EmptyStateAction {
@@ -32,13 +32,13 @@ export interface EmptyStateAction {
   onClick?: () => void;
   /** Renders the button as a link instead. */
   href?: string;
-  /** Optional 1-bit icon before the label. */
-  icon?: TuiIconName;
+  /** Optional icon before the label: a TuiIcon name or an element. */
+  icon?: IconSlot;
 }
 
 export interface EmptyStateProps {
-  /** 1-bit icon shown above the title (default "Archive"). Pass `null` for none. */
-  icon?: TuiIconName | null;
+  /** Icon shown above the title: a TuiIcon name or an element (default "Archive"). Pass `null` for none. */
+  icon?: IconSlot | null;
   /** Short statement of the situation, e.g. "No results". */
   title: ReactNode;
   /** One or two sentences: why it is empty and what to do. */
@@ -97,7 +97,7 @@ export function EmptyState({
       size={s.button}
       onClick={action.onClick}
       href={action.href}
-      iconLeft={action.icon ? <TuiIcon name={action.icon} /> : undefined}
+      iconLeft={action.icon ? renderIconSlot(action.icon) : undefined}
     >
       {action.label}
     </Button>
@@ -107,7 +107,7 @@ export function EmptyState({
     <div className={cn("flex flex-col items-center text-center font-mono", s.root, className)}>
       {icon && (
         <span className={cn("inline-flex plate-round bg-[var(--surface-subtle)] text-[var(--text-secondary)]", s.plate)}>
-          <TuiIcon name={icon} size={s.icon} />
+          {renderIconSlot(icon, { size: s.icon })}
         </span>
       )}
       <div className="flex max-w-prose flex-col gap-1">

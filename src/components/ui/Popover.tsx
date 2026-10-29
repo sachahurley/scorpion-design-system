@@ -52,7 +52,16 @@ import { useControllableState } from "@/lib/use-controllable-state";
 export type PopoverSide = FloatingSide;
 export type PopoverAlign = FloatingAlign;
 
-export interface PopoverProps {
+/**
+ * The named members of a role union. `AriaRole` also admits any string
+ * (`string & {}`), which would let `"dialog"` slip into the non-dialog branch
+ * below, so that open-ended member is dropped. Generic on purpose: the API
+ * manifest resolves every top-level alias up front, and resolving `AriaRole`
+ * that early reorders other components' literal values (and so their hashes).
+ */
+type NamedRole<R> = R extends string ? (string extends R ? never : R) : never;
+
+interface PopoverBaseProps {
   /** Controlled open state. Pair with `onOpenChange`; omit for uncontrolled use. */
   open?: boolean;
   /** Initial open state when uncontrolled (default false). */
@@ -77,7 +86,7 @@ export interface PopoverProps {
   side?: PopoverSide;
   /** Alignment along the anchor edge (default "start"). */
   align?: PopoverAlign;
-  /** Gap between anchor and panel in px (default 8, one plate step multiple). */
+  /** Gap between anchor and panel, in px (default 8, one plate step multiple). */
   offset?: number;
   /** Close when the user presses outside the trigger and panel (default true). */
   closeOnOutsideClick?: boolean;
@@ -93,15 +102,6 @@ export interface PopoverProps {
   returnFocus?: boolean;
   /** Make the panel at least as wide as the anchor (default false). */
   matchAnchorWidth?: boolean;
-  /**
-   * ARIA role of the panel (default "dialog", a non-modal dialog). Pass
-   * `null` when the content carries its own role (a listbox, a menu).
-   */
-  role?: AriaRole | null;
-  /** Accessible name for the panel. Required for `role="dialog"` unless `aria-labelledby` is set. */
-  "aria-label"?: string;
-  /** Id of a visible heading inside the panel that names it. */
-  "aria-labelledby"?: string;
   /** Id for the panel; generated when omitted. */
   id?: string;
   /** Extra classes for the outer ring layer (width, max-width). */
@@ -119,6 +119,54 @@ export interface PopoverProps {
   /** Extra classes for the span that wraps `trigger`. */
   triggerWrapperClassName?: string;
 }
+
+/** A dialog panel (the default role) named by `aria-label`. */
+interface PopoverDialogLabelProps extends PopoverBaseProps {
+  /**
+   * ARIA role of the panel: "dialog" (the default, a non-modal dialog), any other ARIA role, or `null`. A dialog
+   * needs a name, and the type requires one: pass `aria-label` or `aria-labelledby`. Pass `null` when the
+   * content carries its own role (a listbox, a menu).
+   */
+  role?: "dialog";
+  /** Accessible name for the panel. Required for `role="dialog"` unless `aria-labelledby` is set. */
+  "aria-label": string;
+  /** Id of a visible heading inside the panel that names it. Required for `role="dialog"` unless `aria-label` is set. */
+  "aria-labelledby"?: string;
+}
+
+/** A dialog panel (the default role) named by a visible heading. */
+interface PopoverDialogLabelledByProps extends PopoverBaseProps {
+  /**
+   * ARIA role of the panel: "dialog" (the default, a non-modal dialog), any other ARIA role, or `null`. A dialog
+   * needs a name, and the type requires one: pass `aria-label` or `aria-labelledby`. Pass `null` when the
+   * content carries its own role (a listbox, a menu).
+   */
+  role?: "dialog";
+  /** Accessible name for the panel. Required for `role="dialog"` unless `aria-labelledby` is set. */
+  "aria-label"?: string;
+  /** Id of a visible heading inside the panel that names it. Required for `role="dialog"` unless `aria-label` is set. */
+  "aria-labelledby": string;
+}
+
+/** Any other panel role, or none (`null`) when the content carries its own. */
+interface PopoverOtherRoleProps extends PopoverBaseProps {
+  /**
+   * ARIA role of the panel: "dialog" (the default, a non-modal dialog), any other ARIA role, or `null`. A dialog
+   * needs a name, and the type requires one: pass `aria-label` or `aria-labelledby`. Pass `null` when the
+   * content carries its own role (a listbox, a menu).
+   */
+  role: Exclude<NamedRole<AriaRole>, "dialog"> | null;
+  /** Accessible name for the panel. Required for `role="dialog"` unless `aria-labelledby` is set. */
+  "aria-label"?: string;
+  /** Id of a visible heading inside the panel that names it. Required for `role="dialog"` unless `aria-label` is set. */
+  "aria-labelledby"?: string;
+}
+
+/**
+ * Props for `Popover`. When the panel is a dialog (the default role), the
+ * type requires an accessible name: `aria-label` or `aria-labelledby`.
+ */
+export type PopoverProps = PopoverOtherRoleProps | PopoverDialogLabelProps | PopoverDialogLabelledByProps;
 
 type CloseReason = "trigger" | "escape" | "outside" | "blur" | "programmatic";
 

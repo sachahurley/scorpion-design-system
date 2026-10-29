@@ -34,14 +34,32 @@
 
 import { forwardRef, useId, useState, type ChangeEvent, type InputHTMLAttributes, type ReactNode } from "react";
 
-export interface SliderProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size" | "type"> {
+/** Every Slider prop except the requirement that one accessible name is set. */
+interface SliderOwnProps
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, "size" | "type" | "aria-label" | "aria-labelledby"> {
   /**
-   * Optional visible label. When set, renders a <label> associated with the
-   * input via htmlFor/id. Prefer this or `aria-label` so the control is
-   * announced correctly by screen readers.
+   * Visible label tied to the input with htmlFor/id; one of `label`,
+   * `aria-label` or `aria-labelledby` is required. Put the current value in it
+   * when users need to see the number.
    */
   label?: ReactNode;
+  /** Accessible name when the slider has no visible label of its own (a zoom slider in a toolbar). */
+  "aria-label"?: string;
+  /** Id of visible text elsewhere that names the slider, such as a column heading. */
+  "aria-labelledby"?: string;
 }
+
+/** A label that renders something: `null`, `undefined` and booleans would leave the slider unnamed. */
+type VisibleLabel = Exclude<ReactNode, null | undefined | boolean>;
+
+/**
+ * The name a Slider is announced by. The type requires one: a bare range
+ * input is read as "slider, 40" with nothing saying what the number is.
+ */
+type SliderName = { label: VisibleLabel } | { "aria-label": string } | { "aria-labelledby": string };
+
+/** Props of `Slider`: native range-input props plus a required accessible name, given as `label`, `aria-label` or `aria-labelledby`. */
+export type SliderProps = SliderOwnProps & SliderName;
 
 /** Percentage of the range that sits before the thumb, clamped to 0-100. */
 function fillPercent(value: number, min: number, max: number): number {
@@ -52,8 +70,8 @@ function fillPercent(value: number, min: number, max: number): number {
 /**
  * A range input for choosing a number between `min` and `max` by dragging or with the arrow keys.
  *
- * @param label - Optional visible label wired to the input with matching id
- * All other props (min, max, step, value, onChange, disabled, ...) pass
+ * Name it with `label` (a visible label wired to the input by id), or with
+ * `aria-label` / `aria-labelledby`; the type requires one. All other props (min, max, step, value, onChange, disabled, ...) pass
  * through to the native range input.
  */
 export const Slider = forwardRef<HTMLInputElement, SliderProps>(function Slider(

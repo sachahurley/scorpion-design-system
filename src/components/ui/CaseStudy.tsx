@@ -73,8 +73,13 @@ export interface CaseStudyFigure {
   src?: string;
   /** Empty string (the default) marks the image decorative. */
   alt?: string;
-  /** CSS aspect-ratio, e.g. "21 / 9". Defaults to "16 / 9". */
-  aspect?: string;
+  /**
+   * Shape of the frame, as a CSS aspect-ratio: `16 / 9` (default) for most art,
+   * `21 / 9` for a wide diagram (pair it with `width="wide"`), `4 / 3` for a
+   * screenshot or the shape an image pair uses. To type a field in your own data
+   * that feeds this, use `CaseStudyFigure["aspect"]`.
+   */
+  aspect?: "16 / 9" | "21 / 9" | "4 / 3";
   /** Text under the figure; inside a section it is prefixed with the figure number. */
   caption?: string;
   /** Break out of the text column: `wide` or `full` bleed. Omit it to keep the figure in the column. */
@@ -122,8 +127,8 @@ export type CaseStudyContentBlock =
       caption?: string;
       /** Break the slot out of the text column. */
       width?: "wide" | "full";
-      /** CSS aspect-ratio for the placeholder, e.g. "4 / 3". */
-      aspect?: string;
+      /** Shape of the placeholder shown until the slot is filled; the same ratios as an image (default `16 / 9`). */
+      aspect?: CaseStudyFigure["aspect"];
     }
   /** Steps, flows or principles: a connected tree, title over text. */
   | { type: "list"; items: CaseStudyItem[] }
@@ -274,7 +279,7 @@ function Figure({
   );
 }
 
-function Art({ src, alt, aspect }: { src?: string; alt?: string; aspect?: string }) {
+function Art({ src, alt, aspect }: { src?: string; alt?: string; aspect?: CaseStudyFigure["aspect"] }) {
   const ratio = aspect ?? "16 / 9";
   return src ? (
     <img

@@ -19,6 +19,8 @@
  * 
  * Features:
  * - Custom dropdown menu matching Dropdown component styling
+ * - The trigger is an APG select-only combobox (`role="combobox"`,
+ *   `aria-haspopup="listbox"`, `aria-expanded`, `aria-controls`)
  * - Keyboard navigation (Arrow keys, Escape, Enter, Tab closes), announced
  *   through `aria-activedescendant` on the trigger
  * - Click outside to close
@@ -125,7 +127,7 @@ export interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement
    */
   errorMessage?: ReactNode;
   /**
-   * Optional visible label; associates with the custom trigger via `htmlFor` / `id` on the button.
+   * Optional visible label; associates with the custom trigger (the combobox) via `htmlFor` / `id`.
    */
   label?: ReactNode;
 }
@@ -404,11 +406,15 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
         ))}
       </select>
 
-      {/* Custom trigger button — inset fill of the plate ring */}
+      {/* Custom trigger: inset fill of the plate ring. It is the APG
+          select-only combobox (role="combobox" on a native button, which ARIA
+          in HTML allows): the button keeps native focus, disabled and
+          <label htmlFor> wiring, and the combobox role is what supports
+          aria-invalid and aria-activedescendant. */}
       <div className={`plate-round p-px transition-colors [transition-duration:var(--duration-fast)] ${triggerRing} ${disabled ? 'opacity-50' : ''}`}>
-      {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props -- known gap: the trigger should be a select-only combobox, see docs/specs/Select.md */}
       <button
         type="button"
+        role="combobox"
         id={triggerId}
         onClick={toggleDropdown}
         disabled={disabled}

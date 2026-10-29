@@ -43,7 +43,8 @@ import React, {
 } from "react";
 import { cn } from "@/lib/utils";
 import { Tooltip } from "./Tooltip";
-import { TuiIcon, type TuiIconName } from "./TuiIcon";
+import { TuiIcon } from "./TuiIcon";
+import { renderIconSlot, type IconSlot } from "@/lib/icon-slot";
 
 type SideNavContextValue = { collapsed: boolean };
 const SideNavContext = createContext<SideNavContextValue>({ collapsed: false });
@@ -134,8 +135,8 @@ SideNavSection.displayName = "SideNavSection";
 export interface SideNavItemProps {
   /** Row text. Also the accessible name and tooltip in collapsed mode. */
   label: string;
-  /** 1-bit icon shown before the label (strongly recommended; required for a useful collapsed rail). */
-  icon?: TuiIconName;
+  /** Icon shown before the label, a TuiIcon name or an element (strongly recommended; required for a useful collapsed rail). */
+  icon?: IconSlot;
   /** Marks the current route: holds the hover fill and sets `aria-current="page"`. */
   active?: boolean;
   /** Destination; renders an `<a>`. */
@@ -144,7 +145,9 @@ export interface SideNavItemProps {
   onClick?: (event: MouseEvent<HTMLElement>) => void;
   /** Custom link component (e.g. a router `<Link>`); its props go in `asProps`. */
   as?: ElementType;
-  /** Props spread onto the `as` component (`to`, `state`, ...). */
+  /**
+   * Props for the `as` component (`to`, `state`, ...), spread onto it as-is. They are spread untyped: TypeScript does not check them against the `as` component's own props, so a misspelt `to` is not caught at compile time.
+   */
   asProps?: Record<string, unknown>;
   /** Trailing content at the row end (a count Badge, a Kbd hint). Hidden when collapsed. */
   trailing?: ReactNode;
@@ -216,7 +219,7 @@ export function SideNavItem({
 
   const body = (
     <>
-      {icon && <TuiIcon name={icon} className="shrink-0" />}
+      {icon && renderIconSlot(icon, { className: "shrink-0" })}
       <span className={cn("min-w-0 flex-1 truncate", collapsed && "sr-only")}>{label}</span>
       {!collapsed && trailing && <span className="ml-auto shrink-0">{trailing}</span>}
       {isGroup && (
@@ -288,7 +291,7 @@ export function SideNavItem({
   return (
     <li>
       {collapsed ? (
-        <Tooltip content={label} position="right">
+        <Tooltip content={label} side="right">
           {row}
         </Tooltip>
       ) : (

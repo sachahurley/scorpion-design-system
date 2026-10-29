@@ -4,12 +4,15 @@
  * Reusable tooltip component for helpful hints and descriptions
  * Built entirely from design tokens defined in tokens.json
  * 
- * POSITIONS:
- * - top: Above the trigger element (default)
- * - bottom: Below the trigger element
- * - left: To the left of the trigger element
- * - right: To the right of the trigger element
- * 
+ * PLACEMENT (`side` + `align`, decision 0024):
+ * - side top: Above the trigger element (default)
+ * - side bottom: Below the trigger element
+ * - side left: To the left of the trigger element
+ * - side right: To the right of the trigger element
+ * - align center (default) centers the balloon on the trigger; start / end
+ *   line its leading / trailing edge up with the trigger's. The caret always
+ *   points at the trigger's center.
+ *
  * FEATURES:
  * - Arrow/pointer indicator
  * - Viewport-aware: measured after it opens; if the chosen side would
@@ -45,8 +48,10 @@ import {
   type ReactElement,
   type ReactNode,
 } from "react";
+import { warnDeprecated } from "@/lib/deprecate";
 
 type Side = "top" | "bottom" | "left" | "right";
+type Align = "start" | "center" | "end";
 
 const OPPOSITE: Record<Side, Side> = { top: "bottom", bottom: "top", left: "right", right: "left" };
 
@@ -75,9 +80,20 @@ function fitSide(preferred: Side, trigger: Rect, tip: Rect, vw: number, vh: numb
   return room[opposite] >= need(opposite) ? opposite : preferred;
 }
 
-/** Horizontal px nudge that keeps a centered top/bottom balloon on screen. */
-function clampShift(trigger: Rect, tipWidth: number, vw: number): number {
-  const left = trigger.left + trigger.width / 2 - tipWidth / 2;
+/**
+ * Where the balloon starts on the cross axis, before any nudge: its left edge
+ * for top/bottom, its top edge for left/right. `start` and `end` line the
+ * balloon up with the trigger's leading and trailing edge.
+ */
+function crossStart(align: Align, triggerStart: number, triggerSize: number, tipSize: number): number {
+  if (align === "start") return triggerStart;
+  if (align === "end") return triggerStart + triggerSize - tipSize;
+  return triggerStart + triggerSize / 2 - tipSize / 2;
+}
+
+/** Horizontal px nudge that keeps a top/bottom balloon on screen. */
+function clampShift(trigger: Rect, tipWidth: number, vw: number, align: Align): number {
+  const left = crossStart(align, trigger.left, trigger.width, tipWidth);
   const right = left + tipWidth;
   if (left < EDGE) return EDGE - left;
   if (right > vw - EDGE) return Math.max(EDGE - left, vw - EDGE - right);
@@ -90,13 +106,26 @@ export interface TooltipProps {
   /** The trigger. Pass one focusable element so keyboard users can open the tooltip and hear it. */
   children: ReactNode;
   /**
-   * Preferred side of the trigger (default: "top"). It flips to the opposite
+   * Preferred side of the trigger (default "top"). It flips to the opposite
    * side when this one would overflow the viewport.
    */
+  side?: "top" | "right" | "bottom" | "left";
+  /**
+   * Where the balloon sits along the trigger edge (default "center"). `start`
+   * and `end` line its leading or trailing edge up with the trigger's, for a
+   * trigger at the edge of a row; the caret still points at the trigger.
+   */
+  align?: "start" | "center" | "end";
+  /** @deprecated Use `side`. Still honoured when `side` is not passed. */
   position?: "top" | "bottom" | "left" | "right";
-  /** Milliseconds before showing on hover or focus (default: 200). */
+  /** Delay in milliseconds before showing on hover or focus (default 200). Hiding is immediate. */
   delay?: number;
-  /** Max width of the balloon, any CSS length (default: "200px"). */
+  /**
+   * Max width of the balloon, any CSS length (default "200px"); text wraps
+   * inside it. This stays a free CSS length because no token describes a
+   * reading width: the spacing scale stops at 96px and the breakpoints are
+   * page widths. Widen it for a long hint rather than shortening the copy.
+   */
   maxWidth?: string;
   /** Extra classes for the wrapper (e.g. a width class for a full-width trigger). */
   className?: string;
@@ -104,22 +133,25 @@ export interface TooltipProps {
 
 /**
  * A short text hint shown while its trigger is hovered or focused; for interactive content use `Popover`.
- * 
- * @param content - Tooltip text/content to display
- * @param children - Trigger element (wrapped with tooltip)
- * @param position - Tooltip position relative to trigger (default: "top")
- * @param delay - Delay before showing tooltip in ms (default: 200)
- * @param maxWidth - Maximum width of tooltip (default: "200px")
- * @param className - Additional CSS classes for tooltip wrapper
+ *
+ * @example
+ * <Tooltip content="Copy" side="bottom">
+ *   <Button variant="ghost" aria-label="Copy"><TuiIcon name="Copy" /></Button>
+ * </Tooltip>
  */
 export function Tooltip({
   content,
   children,
-  position = "top",
+  side: sideProp,
+  align = "center",
+  position: legacyPosition,
   delay = 200,
   maxWidth = "200px",
   className = "",
 }: TooltipProps) {
+  if (legacyPosition !== undefined) warnDeprecated("Tooltip", "position", "side");
+  // `side` wins over the deprecated `position`
+  const position: Side = sideProp ?? legacyPosition ?? "top";
   const [isVisible, setIsVisible] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -131,7 +163,8 @@ export function Tooltip({
   // keeps a top/bottom balloon inside the viewport.
   const [placement, setPlacement] = useState<Side>(position);
   const [shift, setShift] = useState(0);
-  // Counter-nudge for the caret so it still points at the trigger's center.
+  // Counter-nudge for the caret so it still points at the trigger's center:
+  // horizontal for top/bottom, vertical for left/right.
   const [caretShift, setCaretShift] = useState(0);
 
   const clearTimers = () => {
@@ -185,13 +218,23 @@ export function Tooltip({
     const vw = window.innerWidth || document.documentElement.clientWidth;
     const vh = window.innerHeight || document.documentElement.clientHeight;
     const next = fitSide(position, trigger, tip, vw, vh);
-    const nudge = next === "top" || next === "bottom" ? clampShift(trigger, tip.width, vw) : 0;
+    const vertical = next === "top" || next === "bottom";
+    const nudge = vertical ? clampShift(trigger, tip.width, vw, align) : 0;
+    // The caret is centred on the balloon; move it to the trigger's center,
+    // measured along the cross axis from where the balloon actually starts.
+    // For the default center alignment that is exactly -nudge.
+    const tipSize = vertical ? tip.width : tip.height;
+    const triggerStart = vertical ? trigger.left : trigger.top;
+    const triggerSize = vertical ? trigger.width : trigger.height;
+    const balloonStart = crossStart(align, triggerStart, triggerSize, tipSize) + nudge;
+    const toTriggerCenter =
+      align === "center" ? -nudge : triggerStart + triggerSize / 2 - (balloonStart + tipSize / 2);
     // Keep the 16px caret on the balloon body (inside its stepped corners)
-    const caretLimit = Math.max(0, tip.width / 2 - 12);
+    const caretLimit = Math.max(0, tipSize / 2 - 12);
     setPlacement(next);
     setShift(nudge);
-    setCaretShift(Math.min(caretLimit, Math.max(-caretLimit, -nudge)));
-  }, [isVisible, position, content, maxWidth]);
+    setCaretShift(Math.min(caretLimit, Math.max(-caretLimit, toTriggerCenter)));
+  }, [isVisible, position, align, content, maxWidth]);
 
   // Describe the trigger while the tooltip is open. Only possible when the
   // child is a single element we can clone.
@@ -213,12 +256,19 @@ export function Tooltip({
   // so on a narrow trigger the box collapses and the min-width balloon
   // overflows it — translate centering then centers the collapsed box, not
   // the visible balloon.
-  const positionStyles = {
-    top: "bottom-full left-1/2 -translate-x-1/2 mb-2",
-    bottom: "top-full left-1/2 -translate-x-1/2 mt-2",
-    left: "right-full top-1/2 -translate-y-1/2 mr-2",
-    right: "left-full top-1/2 -translate-y-1/2 ml-2",
+  const sideStyles = {
+    top: "bottom-full mb-2",
+    bottom: "top-full mt-2",
+    left: "right-full mr-2",
+    right: "left-full ml-2",
   };
+  // Cross-axis alignment: horizontal for top/bottom, vertical for left/right.
+  const alignStyles = {
+    horizontal: { start: "left-0", center: "left-1/2 -translate-x-1/2", end: "right-0" },
+    vertical: { start: "top-0", center: "top-1/2 -translate-y-1/2", end: "bottom-0" },
+  };
+  const isVertical = placement === "top" || placement === "bottom";
+  const positionStyles = `${sideStyles[placement]} ${alignStyles[isVertical ? "horizontal" : "vertical"][align]}`;
 
   // 1-BIT STEPPED CARET — two stacked stepped polygons (ring layer + fill layer,
   // fill overlapping the tooltip edge 1px so the ring reads continuous). The
@@ -275,13 +325,14 @@ export function Tooltip({
           role="tooltip"
           className={`
             absolute
-            ${positionStyles[placement]}
+            ${positionStyles}
             w-max
             z-[var(--z-index-tooltip)]
             ${showTooltip ? "opacity-100" : "opacity-0"}
             transition-opacity [transition-duration:var(--duration-fast)]
           `}
           data-placement={placement}
+          data-align={align}
           // The nudge is a margin, not a transform, so it composes with the
           // translate-centering classes instead of replacing them.
           style={{ maxWidth, marginLeft: shift || undefined }}
@@ -298,7 +349,7 @@ export function Tooltip({
           {/* 1-bit stepped caret pointing at the trigger */}
           <div
             className={`absolute ${caretPlacement[placement]}`}
-            style={{ marginLeft: caretShift || undefined }}
+            style={isVertical ? { marginLeft: caretShift || undefined } : { marginTop: caretShift || undefined }}
             aria-hidden="true"
           >
             <div className="relative h-[var(--plate-caret-height)] w-[var(--plate-caret-width)]">
