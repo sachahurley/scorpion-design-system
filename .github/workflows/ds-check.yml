@@ -24,6 +24,12 @@ jobs:
         with:
           repository: sachahurley/scorp-ds
           path: .scorp-ds-truth
+          # The Changelog page is built from scorp-ds history, which a shallow
+          # clone does not have.
+          fetch-depth: 0
 
       - name: Diff vendored DS against scorp-ds main
+        # The token reads the readiness scorecard from scorp-ds issue #136.
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: SCORP_DS_DIR="$GITHUB_WORKSPACE/.scorp-ds-truth" bash scripts/vendor-ds.sh check

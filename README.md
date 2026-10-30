@@ -1,10 +1,10 @@
 # Scorpion Design System
 
-A lean eight-page portfolio site for the Scorpion Design System: a TUI-inspired, token-based system built with React, TypeScript, and Tailwind CSS. The site runs on a vendored snapshot of the design system and links out to the deployed Storybook for all reference documentation.
+A lean nine-page portfolio site for the Scorpion Design System: a TUI-inspired, token-based system built with React, TypeScript, and Tailwind CSS. The site runs on a vendored snapshot of the design system and links out to the deployed Storybook for all reference documentation.
 
 ## 🎨 What is This?
 
-This is the design system's **portfolio front door**, not its documentation site. Eight pages in three groups:
+This is the design system's **portfolio front door**, not its documentation site. Nine pages in three groups:
 
 **Front door**
 
@@ -25,6 +25,7 @@ This is the design system's **portfolio front door**, not its documentation site
 - `/skills` - **Skills**: the named agent workflows that build and maintain scorp-ds
 - `/specs` - **Specs**: every component spec, indexed from `docs/specs/*.md` in scorp-ds
 - `/harness` - **Harness**: the lint rules, CI workflows, contracts, visual baselines and decision records that make each written rule fail out loud
+- `/changelog` - **Changelog**: every pull request merged into scorp-ds, whether it shipped to the sites or stayed in the repo, and the monthly agent-readiness scorecard
 
 Reference documentation (tokens, components, patterns, theming) lives in the deployed Storybook:
 
@@ -70,6 +71,7 @@ scorpion-design-system/
 │   │   ├── Skills.tsx           # The agent workflows
 │   │   ├── Specs.tsx            # The spec index (reads specs-index.json)
 │   │   ├── Harness.tsx          # The verification story (reads harness-index.json)
+│   │   ├── Changelog.tsx        # Every merged scorp-ds PR + scorecard (reads changelog-index.json)
 │   │   ├── patterns/
 │   │   │   ├── CaseStudy.tsx    # Building the Scorpion Design System
 │   │   │   └── MusicPlayerPattern.tsx  # Live music player demo
@@ -77,16 +79,18 @@ scorpion-design-system/
 │   │       └── Screens.tsx      # Mini-app screens demo
 │   ├── data/                    # GENERATED at vendor time, do not hand-edit
 │   │   ├── specs-index.json     # Specs page index
-│   │   └── harness-index.json   # Harness page facts (rules, workflows, counts)
+│   │   ├── harness-index.json   # Harness page facts (rules, workflows, counts)
+│   │   └── changelog-index.json # Changelog page (merged PRs, readiness scorecard)
 │   ├── theme/
 │   │   └── ThemeProvider.tsx    # Theme management
 │   ├── index.css                # Imports the vendored token CSS variables
-│   └── App.tsx                  # Router setup (8 routes + redirects)
+│   └── App.tsx                  # Router setup (9 routes + redirects)
 ├── vendor/scorp-ds/             # Vendored token CSS + Tailwind preset snapshot
 ├── scripts/
 │   ├── vendor-ds.sh             # Re-vendor / check the DS snapshot
 │   ├── gen-specs-index.mjs      # Builds src/data/specs-index.json
-│   └── gen-harness-index.mjs    # Builds src/data/harness-index.json
+│   ├── gen-harness-index.mjs    # Builds src/data/harness-index.json
+│   └── gen-changelog-index.mjs  # Builds src/data/changelog-index.json
 ├── tailwind.config.ts           # Tailwind config using the vendored preset
 └── README.md                    # This file!
 ```
@@ -134,7 +138,7 @@ mechanical Vite adaptations). It is NOT auto-synced when scorp-ds merges.
 
 ### Generated page data
 
-Two files under `src/data/` are **generated, never hand-edited**. Both are
+Three files under `src/data/` are **generated, never hand-edited**. All are
 written by `vendor:ds` and diffed by `ds:check`, so a page cannot quietly quote
 a number the design system no longer has:
 
@@ -144,6 +148,15 @@ a number the design system no longer has:
   `scorp/*` lint rules, the CI workflows, the decision-record README, the
   insight files, and file counts (components, specs, stories, visual
   baselines, tokens). Drives the Harness page, and the counts on Home.
+- `changelog-index.json` - built by `scripts/gen-changelog-index.mjs` from
+  scorp-ds main's first-parent history (one entry per merged PR, tagged
+  "ships" when it touched `packages/components/src` or `packages/tokens`
+  outside tests) and the latest audit comment on scorp-ds issue #136. Drives
+  the Changelog page. It needs full history, so `ds:check` in CI checks
+  scorp-ds out with `fetch-depth: 0`; the scorecard is read over the GitHub
+  API, and an offline run keeps the committed scorecard with a warning.
+  Because every scorp-ds merge adds a row, `ds:check` goes red after any merge
+  until the next vendor pass, docs-only merges included.
 
 The harness generator fails loudly rather than writing a confident zero: if a
 parse finds no lint rules, no baselines or no decision rows, it exits non-zero.
