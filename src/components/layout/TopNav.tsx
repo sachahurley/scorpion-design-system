@@ -1,13 +1,17 @@
 /**
  * TOP NAVIGATION
  *
- * The site's eight-page navigation on the DS plate language, replacing the
+ * The site's nine-page navigation on the DS plate language, replacing the
  * old documentation sidebar. Two renderings share one NAV_ITEMS source:
  *
  * - TopNav: horizontal plate rows inside the TopBar (desktop, xl+)
  * - MobileNav: the slide-in panel below the TopBar (below xl), keeping the
  *   old sidebar's overlay + translate animation and its mobile-only
  *   music player / theme toggle controls
+ *
+ * Desktop rows tighten to px-2 between xl and 2xl: nine labels plus the
+ * wordmark only just fit at 1280px, and at px-3 the run collides with
+ * "Scorpion Design System".
  *
  * Rows use the plate recipe: quiet secondary text idle, surface.muted fill
  * with accent text on hover, and the active route holds that filled state
@@ -19,8 +23,8 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
-/** The eight pages, in nav order: home, the two long-form pages, the two
- *  demos, then the three pages about the system itself. */
+/** The nine pages, in nav order: home, the two long-form pages, the two
+ *  demos, then the four pages about the system itself. */
 const NAV_ITEMS: { to: string; label: string }[] = [
   { to: "/", label: "Home" },
   { to: "/essay", label: "Essay" },
@@ -30,6 +34,7 @@ const NAV_ITEMS: { to: string; label: string }[] = [
   { to: "/skills", label: "Skills" },
   { to: "/specs", label: "Specs" },
   { to: "/harness", label: "Harness" },
+  { to: "/changelog", label: "Changelog" },
 ];
 
 /**
@@ -53,7 +58,7 @@ function NavRow({
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
       className={`
-        flex items-center gap-3 px-3 py-2 plate-round font-mono text-sm whitespace-nowrap
+        flex items-center gap-3 px-3 xl:px-2 2xl:px-3 py-2 plate-round font-mono text-sm whitespace-nowrap
         transition-colors [transition-duration:var(--duration-fast)]
         focus:outline-none focus-visible:[box-shadow:inset_0_0_0_var(--focus-ring-width)_var(--focus-ring-primary)]
         ${
@@ -71,7 +76,7 @@ function NavRow({
 /**
  * TopNav Component
  *
- * Desktop navigation: the eight plate rows in a horizontal run, rendered
+ * Desktop navigation: the nine plate rows in a horizontal run, rendered
  * inside the TopBar (hidden below xl, where MobileNav takes over).
  */
 export function TopNav() {
@@ -104,7 +109,7 @@ export interface MobileNavProps {
  *
  * The mobile menu: a full-width panel that slides in from the left below
  * the TopBar (same overlay + translate recipe as the old sidebar), holding
- * the eight nav rows plus the mobile-only music player and theme controls.
+ * the nine nav rows plus the mobile-only music player and theme controls.
  */
 export function MobileNav({
   isMobileMenuOpen,

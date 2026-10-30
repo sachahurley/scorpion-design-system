@@ -2,7 +2,7 @@
  * TOP BAR COMPONENT
  * 
  * Fixed top bar that spans full width
- * Contains Scorpion logo, branding, the eight-page top nav, and theme toggle
+ * Contains Scorpion logo, branding, the nine-page top nav, and theme toggle
  * Clicking the logo/text takes you back to home page
  * Theme toggle is positioned in the top right corner
  *

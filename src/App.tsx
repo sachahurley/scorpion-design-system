@@ -2,9 +2,9 @@
  * MAIN APP COMPONENT
  *
  * Sets up routing and theme provider for the entire application.
- * Eight pages, all on the Layout with the top nav: Home, the two
+ * Nine pages, all on the Layout with the top nav: Home, the two
  * long-form pages (Essay, Case Study), the two demos (Music Player,
- * Screens), and the three system pages (Skills, Specs, Harness).
+ * Screens), and the four system pages (Skills, Specs, Harness, Changelog).
  *
  * The old documentation routes (foundation, components, tokens, patterns)
  * redirect: reference docs now live in the deployed Storybook at
@@ -22,6 +22,7 @@ import Screens from "@/pages/demos/Screens";
 import Skills from "@/pages/Skills";
 import Harness from "@/pages/Harness";
 import Specs from "@/pages/Specs";
+import Changelog from "@/pages/Changelog";
 
 function App() {
   return (
@@ -29,7 +30,7 @@ function App() {
       <BrowserRouter basename="/scorpion-design-system">
         <Layout>
           <Routes>
-            {/* The eight pages */}
+            {/* The nine pages */}
             <Route path="/" element={<Home />} />
             <Route path="/essay" element={<Essay />} />
             <Route path="/case-study" element={<CaseStudyPage />} />
@@ -38,6 +39,7 @@ function App() {
             <Route path="/skills" element={<Skills />} />
             <Route path="/harness" element={<Harness />} />
             <Route path="/specs" element={<Specs />} />
+            <Route path="/changelog" element={<Changelog />} />
 
             {/* Old pattern pages that kept a home here: redirect to it */}
             <Route path="/patterns/music-player" element={<Navigate to="/demos/music-player" replace />} />

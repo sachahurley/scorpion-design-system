@@ -593,6 +593,9 @@ export default function Harness() {
           <Link as={RouterLink} asProps={{ to: "/specs" }} className="text-sm">
             The specs it checks
           </Link>
+          <Link as={RouterLink} asProps={{ to: "/changelog" }} className="text-sm">
+            Every change it has let through
+          </Link>
         </div>
 
         {/* The publishing consequence of a green run, named so the deploy

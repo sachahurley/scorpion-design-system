@@ -1,7 +1,7 @@
 /**
  * LAYOUT COMPONENT
  * 
- * Main layout wrapper with a fixed top bar carrying the eight-page nav
+ * Main layout wrapper with a fixed top bar carrying the nine-page nav
  * Applied to all pages including home
  *
  * Mobile Navigation:
@@ -103,7 +103,7 @@ export function Layout({ children }: LayoutProps) {
         closeMusicPlayer={closeMusicPlayer}
       />
 
-      {/* Mobile menu - slide-in panel with the eight nav rows */}
+      {/* Mobile menu - slide-in panel with the nine nav rows */}
       {/* Pass mobile menu state, close function, and music player controls to MobileNav */}
       <MobileNav
         isMobileMenuOpen={isMobileMenuOpen}
