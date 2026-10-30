@@ -1,1 +1,1 @@
-af62817 Build the chat composer: Composer, Message, Transcript, CodeBlock (takeover of #99) (#140)
+4632ff7 Window: active boolean replaces variant="active" (#145)
