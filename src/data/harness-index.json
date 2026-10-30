@@ -20,7 +20,7 @@
     "lintRules": 17,
     "skills": 19,
     "decisions": 32,
-    "insights": 6,
+    "insights": 9,
     "tokens": 427
   },
   "lintRules": [
@@ -486,6 +486,21 @@
     }
   ],
   "insights": [
+    {
+      "date": "2026-10-29",
+      "title": "A vendored dist must be built with the toolchain on main",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/insights/2026-10-29-a-vendored-dist-needs-the-current-toolchain.md"
+    },
+    {
+      "date": "2026-10-29",
+      "title": "consumers:check catches what a grep for call sites misses",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/insights/2026-10-29-consumers-check-catches-what-greps-miss.md"
+    },
+    {
+      "date": "2026-10-29",
+      "title": "Parallel PRs collide in generated files, not in source",
+      "url": "https://github.com/sachahurley/scorp-ds/blob/main/docs/insights/2026-10-29-parallel-prs-collide-in-generated-files.md"
+    },
     {
       "date": "2026-10-28",
       "title": "Strong components, but the step from component to screen still needs a human",

@@ -30,7 +30,6 @@
 import { useId, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { TuiIcon } from "./TuiIcon";
-import { warnDeprecated } from "@/lib/deprecate";
 
 export interface WindowProps {
   /** Pane title shown in the title bar; also names the pane and its scroll region. */
@@ -45,12 +44,6 @@ export interface WindowProps {
    * user is working in.
    */
   active?: boolean;
-  /**
-   * The focused-pane marker under its old name: `"active"` is `active`.
-   * When both are passed, `active` wins.
-   * @deprecated Use `active`. A focused pane is a state, not a visual treatment (decision 0024).
-   */
-  variant?: "default" | "active";
   /** Heading element used for the title (default "h2"). Match your page outline. */
   titleAs?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "span";
   /** Scrolling body (default true). Set false to let content size the pane. */
@@ -76,8 +69,7 @@ export function Window({
   title,
   status,
   actions,
-  active: activeProp,
-  variant,
+  active = false,
   titleAs: TitleTag = "h2",
   scroll = true,
   children,
@@ -85,10 +77,6 @@ export function Window({
   bodyClassName,
 }: WindowProps) {
   const titleId = useId();
-  // Deprecated alias (decision 0024): `variant="active"` keeps working, warns once,
-  // and loses to `active` when both are passed.
-  if (variant !== undefined) warnDeprecated("Window", "variant", "active");
-  const active = activeProp ?? variant === "active";
 
   return (
     <section

@@ -1,1 +1,1 @@
-4632ff7 Window: active boolean replaces variant="active" (#145)
+7bff5cb Remove Window's deprecated variant prop (#147)
