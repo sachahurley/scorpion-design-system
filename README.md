@@ -85,7 +85,7 @@ scorpion-design-system/
 │   │   └── ThemeProvider.tsx    # Theme management
 │   ├── index.css                # Imports the vendored token CSS variables
 │   └── App.tsx                  # Router setup (9 routes + redirects)
-├── vendor/scorp-ds/             # Vendored token CSS + Tailwind preset snapshot
+├── vendor/scorp-ds/             # Vendored token CSS, Tailwind preset, component catalog
 ├── scripts/
 │   ├── vendor-ds.sh             # Re-vendor / check the DS snapshot
 │   ├── gen-specs-index.mjs      # Builds src/data/specs-index.json
@@ -160,6 +160,11 @@ a number the design system no longer has:
 
 The harness generator fails loudly rather than writing a confident zero: if a
 parse finds no lint rules, no baselines or no decision rows, it exits non-zero.
+
+`vendor/scorp-ds/catalog.md` is the scorp-ds component catalog, vendored the same
+way (spec links rewritten to GitHub by `scripts/vendor-catalog.sh`) so agents
+working here read the reference for the exact DS version in `src/components/ui/`.
+`CLAUDE.md` points them at it.
 
 Source checkout: `~/Projects/scorp-ds` (override with `SCORP_DS_DIR`). The
 snapshot commit is recorded in `vendor/scorp-ds/VERSION`.
