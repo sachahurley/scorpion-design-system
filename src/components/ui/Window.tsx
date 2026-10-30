@@ -30,6 +30,7 @@
 import { useId, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { TuiIcon } from "./TuiIcon";
+import { warnDeprecated } from "@/lib/deprecate";
 
 export interface WindowProps {
   /** Pane title shown in the title bar; also names the pane and its scroll region. */
@@ -38,7 +39,17 @@ export interface WindowProps {
   status?: ReactNode;
   /** Title bar actions (icon Buttons, a Badge). Keep them small (`size="sm"`). */
   actions?: ReactNode;
-  /** `active` marks the focused pane (accent ring + marker); default is `default`. */
+  /**
+   * Marks the focused pane: the accent ring, a muted title bar and a ChevronRight
+   * marker, so focus never relies on colour alone. Set it on the one pane the
+   * user is working in.
+   */
+  active?: boolean;
+  /**
+   * The focused-pane marker under its old name: `"active"` is `active`.
+   * When both are passed, `active` wins.
+   * @deprecated Use `active`. A focused pane is a state, not a visual treatment (decision 0024).
+   */
   variant?: "default" | "active";
   /** Heading element used for the title (default "h2"). Match your page outline. */
   titleAs?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "span";
@@ -56,7 +67,7 @@ export interface WindowProps {
  * Window
  *
  * ```tsx
- * <Window title="sessions.log" status="tail -f" variant="active" scroll={false} bodyClassName="p-0" className="h-80">
+ * <Window title="sessions.log" status="tail -f" active scroll={false} bodyClassName="p-0" className="h-80">
  *   <LogView lines={lines} framed={false} className="h-full" />
  * </Window>
  * ```
@@ -65,7 +76,8 @@ export function Window({
   title,
   status,
   actions,
-  variant = "default",
+  active: activeProp,
+  variant,
   titleAs: TitleTag = "h2",
   scroll = true,
   children,
@@ -73,12 +85,15 @@ export function Window({
   bodyClassName,
 }: WindowProps) {
   const titleId = useId();
-  const active = variant === "active";
+  // Deprecated alias (decision 0024): `variant="active"` keeps working, warns once,
+  // and loses to `active` when both are passed.
+  if (variant !== undefined) warnDeprecated("Window", "variant", "active");
+  const active = activeProp ?? variant === "active";
 
   return (
     <section
       aria-labelledby={titleId}
-      data-variant={variant}
+      data-active={active || undefined}
       className={cn(
         "plate-round-lg flex flex-col p-px",
         active ? "bg-[var(--accent)]" : "bg-[var(--surface-container-stroke)]",
